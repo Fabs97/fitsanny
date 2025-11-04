@@ -13,6 +13,8 @@ class AppDatabaseCubit extends Cubit<Database?> {
       join(await getDatabasesPath(), 'fitsanny.db'),
       onCreate: (db, version) => db.execute(''),
     );
+
+    emit(_database);
   }
 
   Database get database => _database;

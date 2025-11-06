@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 final _router = GoRouter(
+  initialLocation: '/home',
   routes: [
     ShellRoute(
       builder: (context, state, child) {
@@ -17,20 +18,23 @@ final _router = GoRouter(
           body: SafeArea(
             child: Padding(padding: const EdgeInsets.all(8.0), child: child),
           ),
-          floatingActionButton: ExpandableFab(
-            distance: 112,
-            children: [
-              ActionButton(
-                onPressed: () => context.go('/training'),
-                icon: Icons.fitness_center,
-              ),
-            ],
-          ),
+          floatingActionButton:
+              GoRouterState.of(context).uri.toString() == '/home'
+              ? ExpandableFab(
+                  distance: 112,
+                  children: [
+                    ActionButton(
+                      onPressed: () => context.go('/training'),
+                      icon: Icons.fitness_center,
+                    ),
+                  ],
+                )
+              : null,
         );
       },
       routes: [
         GoRoute(
-          path: '/',
+          path: '/home',
           builder: (context, state) => const HomePage(title: 'Fit Sanny'),
         ),
         GoRoute(

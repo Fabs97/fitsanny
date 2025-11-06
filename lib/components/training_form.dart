@@ -42,6 +42,7 @@ class TrainingForm extends StatelessWidget {
                   label: 'reps',
                   step: 1,
                   initialValue: 1,
+                  isInteger: true,
                 ),
               ),
             ],

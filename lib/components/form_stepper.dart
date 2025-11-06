@@ -4,14 +4,16 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 class FormStepper extends StatefulWidget {
   final String name;
   final String label;
-  final double step;
+  final num step;
   final num initialValue;
+  final bool isInteger;
 
   const FormStepper({
     required this.name,
     required this.label,
     this.step = 0.1,
     this.initialValue = 0,
+    this.isInteger = false,
     super.key,
   });
 
@@ -21,31 +23,43 @@ class FormStepper extends StatefulWidget {
 
 class _FormStepperState extends State<FormStepper> {
   late TextEditingController _controller;
-  late double _currentValue;
+  late num _currentValue;
 
   @override
   void initState() {
     super.initState();
-    _currentValue = widget.initialValue.toDouble();
-    _controller = TextEditingController(text: _currentValue.toStringAsFixed(1));
+    _currentValue = widget.initialValue;
+    _controller = TextEditingController(text: _formatValue(_currentValue));
+  }
+
+  String _formatValue(num value) {
+    return widget.isInteger
+        ? value.toInt().toString()
+        : value.toStringAsFixed(1);
   }
 
   void _increment() {
     setState(() {
       _currentValue += widget.step;
-      _controller.text = _currentValue.toStringAsFixed(1);
+      if (widget.isInteger) {
+        _currentValue = _currentValue.toInt();
+      }
+      _controller.text = _formatValue(_currentValue);
     });
   }
 
   void _decrement() {
     setState(() {
       _currentValue = (_currentValue - widget.step).clamp(0, double.infinity);
-      _controller.text = _currentValue.toStringAsFixed(1);
+      if (widget.isInteger) {
+        _currentValue = _currentValue.toInt();
+      }
+      _controller.text = _formatValue(_currentValue);
     });
   }
 
   void _onChanged(String value) {
-    final val = double.tryParse(value);
+    final val = widget.isInteger ? int.tryParse(value) : double.tryParse(value);
     if (val != null && val >= 0) {
       _currentValue = val;
     }
@@ -53,7 +67,7 @@ class _FormStepperState extends State<FormStepper> {
 
   @override
   Widget build(BuildContext context) {
-    return FormBuilderField<double>(
+    return FormBuilderField<num>(
       name: widget.name,
       initialValue: _currentValue,
       validator: (val) => val == null || val < 0 ? 'Invalid number' : null,
@@ -70,6 +84,7 @@ class _FormStepperState extends State<FormStepper> {
               Expanded(
                 child: TextField(
                   controller: _controller,
+                  textAlign: TextAlign.center,
                   keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
                     signed: false,
@@ -100,7 +115,7 @@ class _FormStepperState extends State<FormStepper> {
   IconButton _buildIconButton(
     IconData icon,
     VoidCallback callback,
-    FormFieldState<double> field,
+    FormFieldState<num> field,
   ) {
     return IconButton(
       visualDensity: VisualDensity.compact,

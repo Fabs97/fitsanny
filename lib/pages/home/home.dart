@@ -1,5 +1,6 @@
 import 'package:fitsanny/components/action_button.dart';
 import 'package:fitsanny/components/expandable_fab.dart';
+import 'package:fitsanny/components/training_form.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
@@ -21,32 +22,29 @@ class HomePage extends StatelessWidget {
         distance: 112,
         children: [
           ActionButton(
-            onPressed: () => _showAction(context, ''),
-            icon: Icons.format_size,
-          ),
-          ActionButton(
-            onPressed: () => _showAction(context, 'Insert Photo'),
-            icon: Icons.insert_photo,
-          ),
-          ActionButton(
-            onPressed: () => _showAction(context, 'Videocam'),
-            icon: Icons.videocam,
+            onPressed: () => _showAction(context),
+            icon: Icons.fitness_center,
           ),
         ],
       ),
     );
   }
 
-  void _showAction(BuildContext context, String title) {
-    showDialog<void>(
+  Future<void> _showAction(BuildContext context) {
+    return showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          content: Text(title),
+        return AlertDialog.adaptive(
+          title: const Text('Create a new Training'),
+          content: TrainingForm(),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('CLOSE'),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => print('save'),
+              child: const Text('Save'),
             ),
           ],
         );

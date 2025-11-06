@@ -1,3 +1,4 @@
+import 'package:fitsanny/model/dto/exercise_dto.dart';
 import 'package:fitsanny/model/exercise.dart';
 import 'package:fitsanny/model/training.dart';
 import 'package:path/path.dart';
@@ -16,12 +17,19 @@ class DatabaseHelper {
       version: _version,
       onCreate: (db, version) async {
         // Database creation logic here
+        // ExerciseName table
         await db.execute(
-          'CREATE TABLE exercise(id INTEGER PRIMARY KEY, name TEXT, reps INTEGER, kgs REAL)',
+          'CREATE TABLE exercise_name(id INTEGER PRIMARY KEY, name TEXT)',
         );
+        // Exercise table
+        await db.execute(
+          'CREATE TABLE exercise(id INTEGER PRIMARY KEY, exerciseNameId INTEGER, reps INTEGER, kgs REAL, FOREIGN KEY(exerciseNameId) REFERENCES exercise_name(id))',
+        );
+        // Training table
         await db.execute(
           'CREATE TABLE training(id INTEGER PRIMARY KEY, title TEXT)',
         );
+        // Training_Exercises junction table
         await db.execute(
           'CREATE TABLE training_exercises(training_id INTEGER, exercise_id INTEGER, FOREIGN KEY(training_id) REFERENCES training(id), FOREIGN KEY(exercise_id) REFERENCES exercise(id))',
         );
@@ -33,13 +41,30 @@ class DatabaseHelper {
     return _getDB();
   }
 
-  static Future<void> insertExercise(Exercise exercise) async {
+  static Future<void> insertExercise(ExerciseDto exercise) async {
     final db = await database;
-    await db.insert(
-      'exercise',
-      exercise.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
+    final exerciseNameObj = await db.query(
+      'exercise_name',
+      where: 'name = ?',
+      whereArgs: [exercise.exerciseName],
     );
+
+    await db.transaction((txn) async {
+      if (exerciseNameObj.isEmpty) {
+        await txn.insert('exercise_name', {
+          'name': exercise.exerciseName,
+        }, conflictAlgorithm: ConflictAlgorithm.ignore);
+      } else {
+        exercise = exercise.copyWith(
+          exerciseNameId: exerciseNameObj.first['id'] as int,
+        );
+      }
+      await txn.insert(
+        'exercise',
+        exercise.toExercise().toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    });
   }
 
   static Future<void> insertTraining(Training training) async {
@@ -76,7 +101,7 @@ class DatabaseHelper {
       List<Exercise> exercises = exerciseMaps.map((e) {
         return Exercise(
           id: e['id'],
-          name: e['name'],
+          exerciseNameId: e['exerciseNameId'],
           reps: e['reps'],
           kgs: e['kgs'],
         );

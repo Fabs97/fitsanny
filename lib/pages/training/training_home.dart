@@ -11,29 +11,6 @@ class TrainingHome extends StatefulWidget {
 class _TrainingHomeState extends State<TrainingHome> {
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
-  }
-
-  Future<void> _dialogBuilder(BuildContext context) {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Create a new Training'),
-          content: TrainingForm(),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () => print('save'),
-              child: const Text('Save'),
-            ),
-          ],
-        );
-      },
-    );
+    return TrainingForm();
   }
 }

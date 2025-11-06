@@ -1,4 +1,4 @@
-import 'package:fitsanny/pages/home/home.dart';
+import 'package:fitsanny/router.dart';
 import 'package:flutter/material.dart';
 
 class App extends StatelessWidget {
@@ -6,12 +6,12 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Fit Sanny',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const HomePage(title: 'Fit Sanny'),
+      routerConfig: router,
     );
   }
 }

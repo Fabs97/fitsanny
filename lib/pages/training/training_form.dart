@@ -24,7 +24,7 @@ class _TrainingFormState extends State<TrainingForm> {
         children: [
           Expanded(
             child: SingleChildScrollView(
-              child: Column(children: _exerciseRows),
+              child: Column(spacing: 8.0, children: _exerciseRows),
             ),
           ),
           Divider(),

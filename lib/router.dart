@@ -1,5 +1,4 @@
-import 'package:fitsanny/components/action_button.dart';
-import 'package:fitsanny/components/expandable_fab.dart';
+import 'package:fitsanny/bottom_bar.dart';
 import 'package:fitsanny/pages/home/home.dart';
 import 'package:fitsanny/pages/training/training_home.dart';
 import 'package:flutter/material.dart';
@@ -16,20 +15,9 @@ final _router = GoRouter(
             title: Text('Fit Sanny'),
           ),
           body: SafeArea(
-            child: Padding(padding: const EdgeInsets.all(8.0), child: child),
+            child: Padding(padding: const EdgeInsets.all(16.0), child: child),
           ),
-          floatingActionButton:
-              GoRouterState.of(context).uri.toString() == '/home'
-              ? ExpandableFab(
-                  distance: 112,
-                  children: [
-                    ActionButton(
-                      onPressed: () => context.go('/training'),
-                      icon: Icons.fitness_center,
-                    ),
-                  ],
-                )
-              : null,
+          bottomNavigationBar: AppBottomBar(),
         );
       },
       routes: [

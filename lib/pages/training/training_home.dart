@@ -1,4 +1,4 @@
-import 'package:fitsanny/components/training_form.dart';
+import 'package:fitsanny/pages/training/training_form.dart';
 import 'package:flutter/material.dart';
 
 class TrainingHome extends StatefulWidget {

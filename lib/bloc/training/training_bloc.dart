@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:fitsanny/bloc/database/database_cubit.dart';
+import 'package:fitsanny/bloc/database/database_bloc.dart';
 import 'package:fitsanny/repositories/training_repository.dart';
 import 'package:fitsanny/model/training.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,12 +7,20 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 part 'training_event.dart';
 part 'training_state.dart';
 
-class TrainingCubit extends Bloc<TrainingEvent, TrainingState> {
+class TrainingBloc extends Bloc<TrainingEvent, TrainingState> {
   final TrainingRepository _trainingRepository;
 
-  TrainingCubit({required TrainingRepository repository})
+  TrainingBloc({required TrainingRepository repository})
     : _trainingRepository = repository,
       super(TrainingInitial([])) {
+    on<LoadTrainingEvent>((event, emit) async {
+      try {
+        final trainings = await _trainingRepository.getTrainings();
+        emit(TrainingLoaded(trainings));
+      } catch (e) {
+        emit(TrainingError('Failed to load trainings: $e'));
+      }
+    });
     on<AddTrainingEvent>((event, emit) async {
       if (state is TrainingLoaded) {
         try {
@@ -27,17 +35,16 @@ class TrainingCubit extends Bloc<TrainingEvent, TrainingState> {
   }
 }
 
-extension TrainingProvider on TrainingCubit {
-  static BlocProvider<TrainingCubit> get provider =>
-      BlocProvider<TrainingCubit>(
-        create: (context) {
-          final databaseCubit = context.read<DatabaseCubit>();
-          if (databaseCubit.database == null) {
-            throw StateError('Database not initialized');
-          }
-          return TrainingCubit(
-            repository: TrainingRepository(databaseCubit.database!),
-          )..add(LoadTrainingEvent());
-        },
+extension TrainingProvider on TrainingBloc {
+  static BlocProvider<TrainingBloc> get provider => BlocProvider<TrainingBloc>(
+    create: (context) {
+      final databaseCubit = context.read<DatabaseBloc>();
+      if (databaseCubit.database == null) {
+        throw StateError('Database not initialized');
+      }
+      return TrainingBloc(
+        repository: TrainingRepository(databaseCubit.database!),
       );
+    },
+  );
 }

@@ -12,6 +12,15 @@ class TrainingInitial extends TrainingState {
   const TrainingInitial(super.trainings);
 }
 
+class TrainingLoading extends TrainingState {
+  const TrainingLoading(super.trainings);
+}
+
 class TrainingLoaded extends TrainingState {
   const TrainingLoaded(super.trainings);
+}
+
+class TrainingError extends TrainingState {
+  final String message;
+  const TrainingError(this.message) : super(const []);
 }

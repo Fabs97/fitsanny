@@ -1,51 +1,54 @@
 import 'dart:io';
-
-import 'package:fitsanny/bloc/database/database_state.dart';
+import 'package:equatable/equatable.dart';
+import 'package:fitsanny/bloc/database/database_create_queries.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-class DatabaseCubit extends Cubit<DatabaseState> {
+part 'database_event.dart';
+part 'database_state.dart';
+
+class DatabaseBloc extends Bloc<DatabaseEvent, DatabaseState> {
   static const int _version = 1;
   static const String _dbName = 'fitsanny.db';
 
-  DatabaseCubit() : super(InitialDatabaseState());
+  DatabaseBloc() : super(InitialDatabaseState()) {
+    on<InitializeDatabaseEvent>((event, emit) async {
+      final databasePath = join(await getDatabasesPath(), _dbName);
+
+      if (!await Directory(dirname(databasePath)).exists()) {
+        await Directory(dirname(databasePath)).create(recursive: true);
+      }
+
+      database = await openDatabase(
+        databasePath,
+        version: _version,
+        onCreate: (db, version) async {
+          [
+            createExerciseNameTableQuery,
+            createExerciseTableQuery,
+            createTrainingTableQuery,
+            createTrainingExercisesTableQuery,
+          ].map((e) async => await db.execute(e)).toList();
+        },
+      );
+
+      emit(LoadedDatabaseState(database!));
+    });
+    on<CloseDatabaseEvent>((event, emit) async {
+      await database?.close();
+      emit(ClosedDatabaseState());
+    });
+    on<LoadDatabaseEvent>((event, emit) async {
+      if (database != null) {
+        emit(LoadedDatabaseState(database!));
+      } else {
+        emit(ErrorDatabaseState('Database not initialized'));
+      }
+    });
+  }
 
   Database? database;
-
-  Future<void> initDatabase() async {
-    final databasePath = join(await getDatabasesPath(), _dbName);
-
-    if (!await Directory(dirname(databasePath)).exists()) {
-      await Directory(dirname(databasePath)).create(recursive: true);
-    }
-
-    database = await openDatabase(
-      databasePath,
-      version: _version,
-      onCreate: (db, version) async {
-        // Database creation logic here
-        // ExerciseName table
-        await db.execute(
-          'CREATE TABLE exercise_name(id INTEGER PRIMARY KEY, name TEXT)',
-        );
-        // Exercise table
-        await db.execute(
-          'CREATE TABLE exercise(id INTEGER PRIMARY KEY, exerciseNameId INTEGER, reps INTEGER, kgs REAL, FOREIGN KEY(exerciseNameId) REFERENCES exercise_name(id))',
-        );
-        // Training table
-        await db.execute(
-          'CREATE TABLE training(id INTEGER PRIMARY KEY, title TEXT)',
-        );
-        // Training_Exercises junction table
-        await db.execute(
-          'CREATE TABLE training_exercises(training_id INTEGER, exercise_id INTEGER, FOREIGN KEY(training_id) REFERENCES training(id), FOREIGN KEY(exercise_id) REFERENCES exercise(id))',
-        );
-      },
-    );
-
-    emit(LoadedDatabaseState());
-  }
 
   // Future<void> insertExercise(ExerciseDto exercise) async {
   //   final exerciseNameObj = await database.query(
@@ -101,9 +104,7 @@ class DatabaseCubit extends Cubit<DatabaseState> {
   // }
 }
 
-extension DatabaseProvider on DatabaseCubit {
-  static BlocProvider<DatabaseCubit> get provider =>
-      BlocProvider<DatabaseCubit>(
-        create: (context) => DatabaseCubit()..initDatabase(),
-      );
+extension DatabaseProvider on DatabaseBloc {
+  static BlocProvider<DatabaseBloc> get provider =>
+      BlocProvider<DatabaseBloc>(create: (context) => DatabaseBloc());
 }

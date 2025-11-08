@@ -28,4 +28,4 @@ linter:
 # https://dart.dev/guides/language/analysis-options
 bloc:
   rules:
-    - prefer_cubit
+    - prefer_bloc

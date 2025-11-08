@@ -4,6 +4,7 @@ import 'package:fitsanny/pages/training/exercise_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:go_router/go_router.dart';
 
 class ExerciseDropdown extends StatefulWidget {
   const ExerciseDropdown({
@@ -92,6 +93,7 @@ class _ExerciseDropdownState extends State<ExerciseDropdown> {
       child: TextButton(
         child: Text('Create'),
         onPressed: () {
+          dropDownFocus.context!.pop();
           showDialog(
             context: context,
             builder: (context) => AlertDialog(

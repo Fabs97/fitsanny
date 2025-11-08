@@ -29,7 +29,6 @@ class ExerciseRow extends StatelessWidget {
               mainAxisSize: MainAxisSize.max,
               children: [
                 ExerciseDropdown(
-                  // use a stable name per exercise index so the Form field keeps its value
                   name: 'exercise_$exerciseIndex',
                   exerciseIndex: exerciseIndex,
                 ),

@@ -31,13 +31,17 @@ class _ExerciseFormState extends State<ExerciseForm> {
               ),
               TextButton(
                 onPressed: () {
-                  context.read<ExerciseNameBloc>().add(
-                    AddExerciseNameEvent(
+                  final name =
                       _formKey.currentState?.fields['exercise_name']?.value ??
-                          '',
-                    ),
-                  );
-                  Navigator.pop(context);
+                      '';
+                  if (name.isNotEmpty) {
+                    context.read<ExerciseNameBloc>().add(
+                      AddExerciseNameEvent(name),
+                    );
+                    Navigator.pop(
+                      context,
+                    ); // Bloc handles refresh automatically
+                  }
                 },
                 child: Text('Save Exercise'),
               ),

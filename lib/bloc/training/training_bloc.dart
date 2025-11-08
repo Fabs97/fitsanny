@@ -3,9 +3,7 @@ import 'package:fitsanny/bloc/database/database_bloc.dart';
 import 'package:fitsanny/pages/training/exercise_row.dart';
 import 'package:fitsanny/repositories/training_repository.dart';
 import 'package:fitsanny/model/training.dart';
-import 'package:flutter/material.dart' show GlobalKey;
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 part 'training_event.dart';
 part 'training_state.dart';

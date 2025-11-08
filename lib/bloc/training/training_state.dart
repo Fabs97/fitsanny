@@ -21,13 +21,9 @@ class TrainingsLoaded extends TrainingState {
 }
 
 class NewTraining extends TrainingState {
-  final GlobalKey<FormBuilderState> _formKey = GlobalKey<FormBuilderState>();
-
   final List<ExerciseRow> exerciseRows = [ExerciseRow()];
 
   NewTraining(super.trainings);
-
-  GlobalKey<FormBuilderState> get formKey => _formKey;
 }
 
 class TrainingsError extends TrainingState {

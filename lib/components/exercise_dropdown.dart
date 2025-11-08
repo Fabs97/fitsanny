@@ -1,4 +1,5 @@
 import 'package:fitsanny/model/exercise.dart';
+import 'package:fitsanny/pages/training/exercise_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
@@ -30,7 +31,18 @@ class _ExerciseDropdownState extends State<ExerciseDropdown> {
               )
             : DropdownMenuItem<String>(
                 value: 'create',
-                child: TextButton(child: Text('Create'), onPressed: () {}),
+                child: TextButton(
+                  child: Text('Create'),
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Create new exercise'),
+                        content: ExerciseForm(),
+                      ),
+                    );
+                  },
+                ),
               ),
       ),
       focusNode: dropDownFocus,

@@ -12,6 +12,8 @@ class TrainingForm extends StatefulWidget {
 }
 
 class _TrainingFormState extends State<TrainingForm> {
+  final GlobalKey<FormBuilderState> _formKey = GlobalKey<FormBuilderState>();
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<TrainingBloc, TrainingState>(
@@ -20,7 +22,7 @@ class _TrainingFormState extends State<TrainingForm> {
           return Center(child: Text('Invalid state for Training Form'));
         }
         return FormBuilder(
-          key: state.formKey,
+          key: _formKey,
           child: Column(
             mainAxisSize: MainAxisSize.max,
             spacing: 10.0,
@@ -44,7 +46,7 @@ class _TrainingFormState extends State<TrainingForm> {
                   ElevatedButton(
                     onPressed: () {
                       print(
-                        "Saving training...: ${state.formKey.currentState?.fields} exercises",
+                        "Saving training...: ${_formKey.currentState?.fields} exercises",
                       );
                     },
                     child: Text('Save'),

@@ -4,6 +4,7 @@ import 'package:fitsanny/pages/training/exercise_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 
 class TrainingForm extends StatefulWidget {
   const TrainingForm({super.key});
@@ -34,6 +35,15 @@ class _TrainingFormState extends State<TrainingForm> {
             mainAxisSize: MainAxisSize.max,
             spacing: 10.0,
             children: [
+              FormBuilderTextField(
+                name: 'title',
+                initialValue: state.newTraining.title,
+                onChanged: (value) => state.newTraining.copyWith(title: value),
+                decoration: const InputDecoration(suffixIcon: Icon(Icons.edit)),
+                validator: FormBuilderValidators.compose([
+                  FormBuilderValidators.required(),
+                ]),
+              ),
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
@@ -63,8 +73,8 @@ class _TrainingFormState extends State<TrainingForm> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      print(
-                        "Saving training...: ${_formKey.currentState?.fields} exercises",
+                      context.read<TrainingBloc>().add(
+                        AddTrainingEvent(state.newTraining),
                       );
                     },
                     child: Text('Save'),

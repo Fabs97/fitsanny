@@ -15,10 +15,19 @@ class Exercise extends Equatable {
 
   const Exercise.empty() : id = null, exerciseNameId = 0, reps = 1, kgs = 5.0;
 
+  factory Exercise.fromJson(Map<String, dynamic> json) {
+    return Exercise(
+      id: json['id'],
+      exerciseNameId: json['exercise_name_id'],
+      reps: json['reps'],
+      kgs: json['kgs'],
+    );
+  }
+
   Map<String, Object?> toMap() {
     return {
       'id': id,
-      'exerciseNameId': exerciseNameId,
+      'exercise_name_id': exerciseNameId,
       'reps': reps,
       'kgs': kgs,
     };
@@ -32,9 +41,11 @@ class Exercise extends Equatable {
   @override
   List<Object?> get props => [id, exerciseNameId, reps, kgs];
 
-  Exercise copyWith({int? exerciseNameId, int? reps, double? kgs}) => Exercise(
-    exerciseNameId: exerciseNameId ?? this.exerciseNameId,
-    reps: reps ?? this.reps,
-    kgs: kgs ?? this.kgs,
-  );
+  Exercise copyWith({int? id, int? exerciseNameId, int? reps, double? kgs}) =>
+      Exercise(
+        id: id ?? this.id,
+        exerciseNameId: exerciseNameId ?? this.exerciseNameId,
+        reps: reps ?? this.reps,
+        kgs: kgs ?? this.kgs,
+      );
 }

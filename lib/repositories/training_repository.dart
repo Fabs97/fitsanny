@@ -1,5 +1,6 @@
 import 'package:fitsanny/model/exercise.dart';
 import 'package:fitsanny/model/training.dart';
+import 'package:fitsanny/utils/database_constants.dart';
 import 'package:sqflite/sqflite.dart';
 
 class TrainingRepository {
@@ -10,16 +11,30 @@ class TrainingRepository {
   Future<Training> insertTraining(Training training) async {
     final newTrainingId = await _database.transaction<int>((txn) async {
       try {
+        training = training.copyWith(
+          exercises: await Future.wait(
+            training.exercises.map((e) async {
+              if (e.id != null) return e;
+              final id = await txn.insert(
+                getDatabaseTable(DatabaseTablesEnum.exercise),
+                e.toMap(),
+              );
+              return e.copyWith(id: id);
+            }),
+          ),
+        );
+
         int id = await txn.insert(
           'training',
           training.toMap(),
           conflictAlgorithm: ConflictAlgorithm.replace,
         );
         for (var exercise in training.exercises) {
-          await txn.insert('training_exercises', {
-            'training_id': id,
-            'exercise_id': exercise.id,
-          }, conflictAlgorithm: ConflictAlgorithm.replace);
+          await txn.insert(
+            getDatabaseTable(DatabaseTablesEnum.trainingExercise),
+            {'training_id': id, 'exercise_id': exercise.id},
+            conflictAlgorithm: ConflictAlgorithm.replace,
+          );
         }
         return id;
       } catch (e) {
@@ -38,20 +53,15 @@ class TrainingRepository {
     List<Training> trainings = [];
     for (var trainingMap in trainingMaps) {
       final List<Map<String, dynamic>> exerciseMaps = await _database.rawQuery(
-        'SELECT e.* FROM exercise e '
-        'JOIN training_exercises te ON e.id = te.exercise_id '
+        'SELECT e.* FROM ${getDatabaseTable(DatabaseTablesEnum.exercise)} e '
+        'JOIN ${getDatabaseTable(DatabaseTablesEnum.trainingExercise)} te ON e.id = te.exercise_id '
         'WHERE te.training_id = ?',
         [trainingMap['id']],
       );
 
-      List<Exercise> exercises = exerciseMaps.map((e) {
-        return Exercise(
-          id: e['id'],
-          exerciseNameId: e['exerciseNameId'],
-          reps: e['reps'],
-          kgs: e['kgs'],
-        );
-      }).toList();
+      List<Exercise> exercises = exerciseMaps
+          .map((e) => Exercise.fromJson(e))
+          .toList();
 
       trainings.add(
         Training(

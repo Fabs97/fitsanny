@@ -1,7 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:fitsanny/bloc/database/database_bloc.dart';
 import 'package:fitsanny/model/exercise.dart';
-import 'package:fitsanny/pages/training/exercise_row.dart';
 import 'package:fitsanny/repositories/training_repository.dart';
 import 'package:fitsanny/model/training.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

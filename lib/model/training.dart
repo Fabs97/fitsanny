@@ -8,12 +8,11 @@ class Training extends Equatable {
 
   const Training({this.id, required this.title, required this.exercises});
 
+  factory Training.fromJson(Map<String, dynamic> json) =>
+      Training(title: json['title'], exercises: json['exercises']);
+
   Map<String, Object?> toMap() {
-    return {
-      'id': id,
-      'title': title,
-      'exercises': exercises.map((e) => e.toMap()).toList(),
-    };
+    return {'id': id, 'title': title};
   }
 
   @override

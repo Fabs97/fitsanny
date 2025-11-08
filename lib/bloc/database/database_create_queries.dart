@@ -9,7 +9,6 @@ final String createExerciseTableQuery = '''
 CREATE TABLE exercise(
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   exercise_name_id INTEGER,
-  sets INTEGER,
   reps INTEGER,
   kgs REAL,
   FOREIGN KEY(exercise_name_id) REFERENCES exercise_name(id)

@@ -1,6 +1,7 @@
+import 'package:equatable/equatable.dart';
 import 'package:fitsanny/model/exercise.dart';
 
-class Training {
+class Training extends Equatable {
   final int id;
   final String title;
   final List<Exercise> exercises;
@@ -22,5 +23,16 @@ class Training {
   @override
   String toString() {
     return 'Training { id: $id, title: $title, exercises: [${exercises.map((e) => e.toString()).join(", ")}] }';
+  }
+
+  @override
+  List<Object?> get props => [id, title, exercises];
+
+  Training copyWith({int? id, String? title, List<Exercise>? exercises}) {
+    return Training(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      exercises: exercises ?? this.exercises,
+    );
   }
 }

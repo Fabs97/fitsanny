@@ -13,19 +13,19 @@ class ExerciseNameBloc extends Bloc<ExerciseNameEvent, ExerciseNamesState> {
   ExerciseNameBloc({required ExerciseNameRepository repository})
     : _exerciseNameRepository = repository,
       super(ExerciseNamesInitial()) {
-    on<LoadExerciseNamesEvent>((event, emit) async {
-      final exerciseNames = await _exerciseNameRepository.getExerciseNames();
-      emit(ExerciseNamesLoaded(exerciseNames));
-    });
+    on<LoadExerciseNamesEvent>(_loadExerciseNames);
     on<AddExerciseNameEvent>((event, emit) async {
       if (state is! ExerciseNamesLoaded) {
         emit(ExerciseNamesError('Exercise names not loaded'));
       } else {
         await _exerciseNameRepository.addExerciseName(event.name);
-        final exerciseNames = await _exerciseNameRepository.getExerciseNames();
-        emit(ExerciseNamesLoaded(exerciseNames));
+        _loadExerciseNames(event, emit);
       }
     });
+  }
+  void _loadExerciseNames(event, emit) async {
+    final exerciseNames = await _exerciseNameRepository.getExerciseNames();
+    emit(ExerciseNamesLoaded(exerciseNames));
   }
 }
 

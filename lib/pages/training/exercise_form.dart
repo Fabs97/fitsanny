@@ -37,6 +37,7 @@ class _ExerciseFormState extends State<ExerciseForm> {
                           '',
                     ),
                   );
+                  Navigator.pop(context);
                 },
                 child: Text('Save Exercise'),
               ),

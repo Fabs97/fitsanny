@@ -16,8 +16,8 @@ class ExerciseNameRepository {
     }).toList();
   }
 
-  Future<void> addExerciseName(String name) async {
-    await _database.insert('exercise_name', {
+  Future<int> addExerciseName(String name) async {
+    return await _database.insert('exercise_name', {
       'name': name,
     }, conflictAlgorithm: ConflictAlgorithm.fail);
   }

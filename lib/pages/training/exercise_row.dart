@@ -1,7 +1,8 @@
+import 'package:fitsanny/components/exercise_dropdown.dart';
 import 'package:fitsanny/components/form_stepper.dart';
+import 'package:fitsanny/model/exercise.dart';
 import 'package:fitsanny/utils/uuid_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 class ExerciseRow extends StatelessWidget {
   @override
@@ -19,17 +20,17 @@ class ExerciseRow extends StatelessWidget {
           spacing: 10.0,
           mainAxisSize: MainAxisSize.max,
           children: [
-            FormBuilderDropdown(
+            ExerciseDropdown(
               name: 'exercise_$key',
-              initialValue: 'Bulgarian split squats',
-              items: ['Bulgarian split squats', 'Squats']
-                  .map(
-                    (exercise) => DropdownMenuItem(
-                      value: exercise,
-                      child: Text(exercise),
-                    ),
-                  )
-                  .toList(),
+              items: List.generate(
+                5,
+                (exercise) => Exercise(
+                  id: exercise,
+                  exerciseNameId: exercise,
+                  reps: 0,
+                  kgs: 0,
+                ),
+              ),
             ),
             Row(
               spacing: 10.0,

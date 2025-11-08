@@ -1,5 +1,4 @@
 import 'package:fitsanny/bloc/training/training_bloc.dart';
-import 'package:fitsanny/pages/training/training_form.dart';
 import 'package:fitsanny/pages/training/trainings_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

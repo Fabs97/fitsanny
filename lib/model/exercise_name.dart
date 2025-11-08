@@ -1,4 +1,6 @@
-class ExerciseName {
+import 'package:equatable/equatable.dart';
+
+class ExerciseName extends Equatable {
   final int id;
   final String name;
 
@@ -16,4 +18,7 @@ class ExerciseName {
   String toString() {
     return 'ExerciseName { id: $id, name: $name }';
   }
+
+  @override
+  List<Object?> get props => [id, name];
 }

@@ -18,9 +18,23 @@ class TrainingsLoaded extends TrainingState {
 }
 
 class NewTraining extends TrainingState {
-  final List<ExerciseRow> exerciseRows = [ExerciseRow()];
+  final Training newTraining = Training(
+    title: 'New Training',
+    exercises: [Exercise.empty()],
+  );
 
   NewTraining();
+
+  void addExercise({Exercise exercise = const Exercise.empty()}) {
+    newTraining.exercises.add(exercise);
+  }
+
+  void changeExercise(int index, int exerciseNameId) {
+    // copyWith returns a new Exercise instance; assign it back to persist the change
+    newTraining.exercises[index] = newTraining.exercises[index].copyWith(
+      exerciseNameId: exerciseNameId,
+    );
+  }
 }
 
 class TrainingsError extends TrainingState {

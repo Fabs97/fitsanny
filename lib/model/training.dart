@@ -2,15 +2,11 @@ import 'package:equatable/equatable.dart';
 import 'package:fitsanny/model/exercise.dart';
 
 class Training extends Equatable {
-  final int id;
+  final int? id;
   final String title;
   final List<Exercise> exercises;
 
-  const Training({
-    required this.id,
-    required this.title,
-    required this.exercises,
-  });
+  const Training({this.id, required this.title, required this.exercises});
 
   Map<String, Object?> toMap() {
     return {

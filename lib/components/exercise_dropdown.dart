@@ -1,13 +1,19 @@
 import 'package:fitsanny/bloc/exercise_name/exercise_name_bloc.dart';
+import 'package:fitsanny/bloc/training/training_bloc.dart';
 import 'package:fitsanny/pages/training/exercise_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 class ExerciseDropdown extends StatefulWidget {
-  const ExerciseDropdown({super.key, required this.name});
+  const ExerciseDropdown({
+    super.key,
+    required this.name,
+    required this.exerciseIndex,
+  });
 
   final String name;
+  final int exerciseIndex;
 
   @override
   State<ExerciseDropdown> createState() => _ExerciseDropdownState();
@@ -21,51 +27,68 @@ class _ExerciseDropdownState extends State<ExerciseDropdown> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ExerciseNameBloc, ExerciseNamesState>(
-      builder: (context, state) {
-        if (state is ExerciseNamesError) {
-          return Center(child: Text('Error: ${state.message}'));
+      builder: (context, exerciseNameState) {
+        if (exerciseNameState is ExerciseNamesError) {
+          return Center(child: Text('Error: ${exerciseNameState.message}'));
         }
-        return FormBuilderDropdown<String>(
-          name: widget.name,
-          items: state is ExerciseNamesLoaded && state.exerciseNames.isNotEmpty
-              ? [
-                  ...state.exerciseNames.map(
-                    (exerciseName) => DropdownMenuItem<String>(
-                      value: exerciseName.id.toString(),
-                      child: Text(exerciseName.name),
-                    ),
-                  ),
-                  _buildCreateNewItem(context),
-                ]
-              : state is ExerciseNamesLoaded && state.exerciseNames.isEmpty
-              ? [
-                  DropdownMenuItem(
-                    value: null,
-                    child: Text('No exercises available'),
-                  ),
-                  _buildCreateNewItem(context),
-                ]
-              : [
-                  DropdownMenuItem(
-                    value: null,
-                    child: Text('Loading exercises...'),
-                  ),
-                ],
-          focusNode: dropDownFocus,
-          isExpanded: true,
-          onChanged: (String? value) {
-            setState(() {
-              selectedValue = value;
-            });
+        return BlocBuilder<TrainingBloc, TrainingState>(
+          builder: (context, trainingState) {
+            if (trainingState is NewTraining) {
+              return FormBuilderDropdown<int>(
+                name: widget.name,
+                hint: const Text('Choose an exercise'),
+                items:
+                    exerciseNameState is ExerciseNamesLoaded &&
+                        exerciseNameState.exerciseNames.isNotEmpty
+                    ? [
+                        ...exerciseNameState.exerciseNames.map(
+                          (exerciseName) => DropdownMenuItem<int>(
+                            value: exerciseName.id,
+                            child: Text(exerciseName.name),
+                          ),
+                        ),
+                        _buildCreateNewItem(context),
+                      ]
+                    : exerciseNameState is ExerciseNamesLoaded &&
+                          exerciseNameState.exerciseNames.isEmpty
+                    ? [
+                        DropdownMenuItem(
+                          value: null,
+                          child: Text('No exercises available'),
+                        ),
+                        _buildCreateNewItem(context),
+                      ]
+                    : [
+                        DropdownMenuItem(
+                          value: null,
+                          child: Text('Loading exercises...'),
+                        ),
+                      ],
+                focusNode: dropDownFocus,
+                isExpanded: true,
+                onChanged: (int? value) {
+                  if (value != null) {
+                    // changeExercise expects (index, exerciseNameId)
+                    trainingState.changeExercise(widget.exerciseIndex, value);
+                  }
+                },
+              );
+            } else {
+              return Center(
+                child: Text(
+                  "ExerciseDropdown::build - Training State ${trainingState.runtimeType}",
+                ),
+              );
+            }
           },
         );
       },
     );
   }
 
-  DropdownMenuItem<String> _buildCreateNewItem(BuildContext context) {
-    return DropdownMenuItem<String>(
-      value: 'create',
+  DropdownMenuItem<int> _buildCreateNewItem(BuildContext context) {
+    return DropdownMenuItem<int>(
+      value: 0,
       child: TextButton(
         child: Text('Create'),
         onPressed: () {

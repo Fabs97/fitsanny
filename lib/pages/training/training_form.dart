@@ -16,8 +16,13 @@ class _TrainingFormState extends State<TrainingForm> {
   final GlobalKey<FormBuilderState> _formKey = GlobalKey<FormBuilderState>();
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
     context.read<ExerciseNameBloc>().add(LoadExerciseNamesEvent());
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return BlocBuilder<TrainingBloc, TrainingState>(
       builder: (context, state) {
         if (state is! NewTraining) {
@@ -31,7 +36,18 @@ class _TrainingFormState extends State<TrainingForm> {
             children: [
               Expanded(
                 child: SingleChildScrollView(
-                  child: Column(spacing: 8.0, children: state.exerciseRows),
+                  child: Column(
+                    spacing: 8.0,
+                    children: state.newTraining.exercises
+                        .asMap()
+                        .map(
+                          (idx, _) =>
+                              MapEntry(idx, ExerciseRow(exerciseIndex: idx)),
+                        )
+                        .values
+                        .toList()
+                        .cast<Widget>(),
+                  ),
                 ),
               ),
               Divider(),
@@ -41,7 +57,7 @@ class _TrainingFormState extends State<TrainingForm> {
                 children: [
                   ElevatedButton(
                     onPressed: () => setState(() {
-                      state.exerciseRows.add(ExerciseRow());
+                      state.addExercise();
                     }),
                     child: Text('Add Exercise'),
                   ),

@@ -1,8 +1,11 @@
 import 'package:equatable/equatable.dart';
 import 'package:fitsanny/bloc/database/database_bloc.dart';
+import 'package:fitsanny/pages/training/exercise_row.dart';
 import 'package:fitsanny/repositories/training_repository.dart';
 import 'package:fitsanny/model/training.dart';
+import 'package:flutter/material.dart' show GlobalKey;
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 part 'training_event.dart';
 part 'training_state.dart';
@@ -12,21 +15,24 @@ class TrainingBloc extends Bloc<TrainingEvent, TrainingState> {
 
   TrainingBloc({required TrainingRepository repository})
     : _trainingRepository = repository,
-      super(TrainingInitial([])) {
-    on<LoadTrainingEvent>((event, emit) async {
+      super(TrainingsInitial([])) {
+    on<LoadTrainingsEvent>((event, emit) async {
       try {
         final trainings = await _trainingRepository.getTrainings();
-        emit(TrainingLoaded(trainings));
+        emit(TrainingsLoaded(trainings));
       } catch (e) {
-        emit(TrainingError('Failed to load trainings: $e'));
+        emit(TrainingsError('Failed to load trainings: $e'));
       }
     });
+    on<NewTrainingEvent>((event, emit) {
+      emit(NewTraining(state.trainings));
+    });
     on<AddTrainingEvent>((event, emit) async {
-      if (state is TrainingLoaded) {
+      if (state is NewTraining) {
         try {
           await _trainingRepository.insertTraining(event.training);
           final trainings = await _trainingRepository.getTrainings();
-          emit(TrainingLoaded(trainings));
+          emit(TrainingsLoaded(trainings));
         } catch (e) {
           print(e); //TODO - Snackbar
         }

@@ -8,7 +8,9 @@ abstract class TrainingEvent extends Equatable {
 }
 
 //Event Designed for READING The Elements
-class LoadTrainingEvent extends TrainingEvent {}
+class LoadTrainingsEvent extends TrainingEvent {}
+
+class NewTrainingEvent extends TrainingEvent {}
 
 //Event Designed for CREATING New Elements
 class AddTrainingEvent extends TrainingEvent {

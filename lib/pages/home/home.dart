@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
-  final String title;
+  final String title = 'Fit Sanny';
 
-  const HomePage({super.key, required this.title});
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [Center(child: const Text('Hallo Sanny'))]);
+    return Column(children: [Center(child: Text(title))]);
   }
 }

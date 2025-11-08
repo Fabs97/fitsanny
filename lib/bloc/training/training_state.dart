@@ -8,19 +8,29 @@ class TrainingState extends Equatable {
   List<Object> get props => [trainings];
 }
 
-class TrainingInitial extends TrainingState {
-  const TrainingInitial(super.trainings);
+class TrainingsInitial extends TrainingState {
+  const TrainingsInitial(super.trainings);
 }
 
-class TrainingLoading extends TrainingState {
-  const TrainingLoading(super.trainings);
+class TrainingsLoading extends TrainingState {
+  const TrainingsLoading(super.trainings);
 }
 
-class TrainingLoaded extends TrainingState {
-  const TrainingLoaded(super.trainings);
+class TrainingsLoaded extends TrainingState {
+  const TrainingsLoaded(super.trainings);
 }
 
-class TrainingError extends TrainingState {
+class NewTraining extends TrainingState {
+  final GlobalKey<FormBuilderState> _formKey = GlobalKey<FormBuilderState>();
+
+  final List<ExerciseRow> exerciseRows = [ExerciseRow()];
+
+  NewTraining(super.trainings);
+
+  GlobalKey<FormBuilderState> get formKey => _formKey;
+}
+
+class TrainingsError extends TrainingState {
   final String message;
-  const TrainingError(this.message) : super(const []);
+  const TrainingsError(this.message) : super(const []);
 }

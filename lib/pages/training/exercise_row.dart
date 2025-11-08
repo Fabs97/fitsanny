@@ -1,8 +1,12 @@
 import 'package:fitsanny/components/form_stepper.dart';
+import 'package:fitsanny/utils/uuid_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 class ExerciseRow extends StatelessWidget {
+  @override
+  Key? get key => ValueKey(UuidUtils.generate());
+
   const ExerciseRow({super.key});
 
   @override
@@ -16,7 +20,7 @@ class ExerciseRow extends StatelessWidget {
           mainAxisSize: MainAxisSize.max,
           children: [
             FormBuilderDropdown(
-              name: 'Excercise',
+              name: 'exercise_$key',
               initialValue: 'Bulgarian split squats',
               items: ['Bulgarian split squats', 'Squats']
                   .map(
@@ -32,7 +36,7 @@ class ExerciseRow extends StatelessWidget {
               children: [
                 Expanded(
                   child: FormStepper(
-                    name: 'kgs',
+                    name: 'kgs_$key',
                     label: 'kgs',
                     step: 0.5,
                     initialValue: 5,
@@ -40,7 +44,7 @@ class ExerciseRow extends StatelessWidget {
                 ),
                 Expanded(
                   child: FormStepper(
-                    name: 'reps',
+                    name: 'reps_$key',
                     label: 'reps',
                     step: 1,
                     initialValue: 1,

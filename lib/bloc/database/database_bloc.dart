@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/services.dart';
 import 'package:equatable/equatable.dart';
 import 'package:fitsanny/bloc/database/database_create_queries.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,9 +16,23 @@ class DatabaseBloc extends Bloc<DatabaseEvent, DatabaseState> {
   DatabaseBloc() : super(InitialDatabaseState()) {
     on<InitializeDatabaseEvent>((event, emit) async {
       final databasePath = join(await getDatabasesPath(), _dbName);
+      var exists = await databaseExists(databasePath);
 
-      if (!await Directory(dirname(databasePath)).exists()) {
-        await Directory(dirname(databasePath)).create(recursive: true);
+      if (!exists) {
+        // Make sure the directory exists
+        try {
+          await Directory(dirname(databasePath)).create(recursive: true);
+        } catch (_) {}
+
+        // Copy from asset
+        ByteData data = await rootBundle.load('assets/$_dbName');
+        List<int> bytes = data.buffer.asUint8List(
+          data.offsetInBytes,
+          data.lengthInBytes,
+        );
+
+        // Write and flush the bytes
+        await File(databasePath).writeAsBytes(bytes, flush: true);
       }
 
       database = await openDatabase(

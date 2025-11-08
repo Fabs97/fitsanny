@@ -13,16 +13,19 @@ final _router = GoRouter(
         if (state.fullPath == '/') {
           return '/home';
         }
+        return state.fullPath;
       },
       routes: [
         GoRoute(path: '/home', builder: (context, state) => const HomePage()),
         GoRoute(
           path: '/training',
           builder: (context, state) => const TrainingHome(),
-        ),
-        GoRoute(
-          path: '/training/new',
-          builder: (context, state) => const TrainingForm(),
+          routes: [
+            GoRoute(
+              path: '/new',
+              builder: (context, state) => const TrainingForm(),
+            ),
+          ],
         ),
       ],
     ),

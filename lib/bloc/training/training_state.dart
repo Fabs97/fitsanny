@@ -1,32 +1,29 @@
 part of 'training_bloc.dart';
 
 class TrainingState extends Equatable {
-  final List<Training> trainings;
-  const TrainingState(this.trainings);
+  const TrainingState();
 
   @override
-  List<Object> get props => [trainings];
+  List<Object> get props => [];
 }
 
-class TrainingsInitial extends TrainingState {
-  const TrainingsInitial(super.trainings);
-}
+class TrainingsInitial extends TrainingState {}
 
-class TrainingsLoading extends TrainingState {
-  const TrainingsLoading(super.trainings);
-}
+class TrainingsLoading extends TrainingState {}
 
 class TrainingsLoaded extends TrainingState {
-  const TrainingsLoaded(super.trainings);
+  final List<Training> trainings;
+
+  const TrainingsLoaded(this.trainings);
 }
 
 class NewTraining extends TrainingState {
   final List<ExerciseRow> exerciseRows = [ExerciseRow()];
 
-  NewTraining(super.trainings);
+  NewTraining();
 }
 
 class TrainingsError extends TrainingState {
   final String message;
-  const TrainingsError(this.message) : super(const []);
+  const TrainingsError(this.message) : super();
 }

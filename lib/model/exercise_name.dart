@@ -8,6 +8,10 @@ class ExerciseName {
     return {'id': id, 'name': name};
   }
 
+  factory ExerciseName.fromMap(Map<String, dynamic> map) {
+    return ExerciseName(id: map['id'] as int, name: map['name'] as String);
+  }
+
   @override
   String toString() {
     return 'ExerciseName { id: $id, name: $name }';

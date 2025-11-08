@@ -1,3 +1,4 @@
+import 'package:fitsanny/bloc/exercise_name/exercise_name_bloc.dart';
 import 'package:fitsanny/bloc/training/training_bloc.dart';
 import 'package:fitsanny/pages/training/exercise_row.dart';
 import 'package:flutter/material.dart';
@@ -16,10 +17,11 @@ class _TrainingFormState extends State<TrainingForm> {
 
   @override
   Widget build(BuildContext context) {
+    context.read<ExerciseNameBloc>().add(LoadExerciseNamesEvent());
     return BlocBuilder<TrainingBloc, TrainingState>(
       builder: (context, state) {
         if (state is! NewTraining) {
-          return Center(child: Text('Invalid state for Training Form'));
+          return Center(child: Text('Loading...'));
         }
         return FormBuilder(
           key: _formKey,

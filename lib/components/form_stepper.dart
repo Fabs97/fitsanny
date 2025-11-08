@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 class FormStepper extends StatefulWidget {
@@ -85,6 +86,11 @@ class _FormStepperState extends State<FormStepper> {
                 child: TextField(
                   controller: _controller,
                   textAlign: TextAlign.center,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(
+                      RegExp(r'^\d*\.?\d{0,1}'),
+                    ),
+                  ],
                   keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
                     signed: false,

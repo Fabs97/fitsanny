@@ -10,7 +10,7 @@ class TrainingsView extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<TrainingBloc, TrainingState>(
       builder: (context, state) {
-        return state.trainings.isEmpty
+        return state is TrainingsLoaded && state.trainings.isEmpty
             ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -24,7 +24,8 @@ class TrainingsView extends StatelessWidget {
                   ),
                 ],
               )
-            : SingleChildScrollView(
+            : state is TrainingsLoaded
+            ? SingleChildScrollView(
                 child: Column(
                   children: [
                     for (var training in state.trainings)
@@ -36,7 +37,8 @@ class TrainingsView extends StatelessWidget {
                       ),
                   ],
                 ),
-              );
+              )
+            : Center(child: Text('Loading trainings...'));
       },
     );
   }

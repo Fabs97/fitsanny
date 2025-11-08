@@ -1,5 +1,6 @@
 import 'package:fitsanny/app.dart';
 import 'package:fitsanny/bloc/database/database_bloc.dart';
+import 'package:fitsanny/bloc/exercise_name/exercise_name_bloc.dart';
 import 'package:fitsanny/bloc/training/training_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,7 +21,10 @@ class MyApp extends StatelessWidget {
         builder: (context, state) {
           if (state is LoadedDatabaseState) {
             return MultiBlocProvider(
-              providers: [TrainingProvider.provider],
+              providers: [
+                TrainingProvider.provider,
+                ExerciseNamesProvider.provider,
+              ],
               child: App(),
             );
           } else if (state is ErrorDatabaseState) {

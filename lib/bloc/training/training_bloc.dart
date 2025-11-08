@@ -13,7 +13,7 @@ class TrainingBloc extends Bloc<TrainingEvent, TrainingState> {
 
   TrainingBloc({required TrainingRepository repository})
     : _trainingRepository = repository,
-      super(TrainingsInitial([])) {
+      super(TrainingsInitial()) {
     on<LoadTrainingsEvent>((event, emit) async {
       try {
         final trainings = await _trainingRepository.getTrainings();
@@ -23,7 +23,7 @@ class TrainingBloc extends Bloc<TrainingEvent, TrainingState> {
       }
     });
     on<NewTrainingEvent>((event, emit) {
-      emit(NewTraining(state.trainings));
+      emit(NewTraining());
     });
     on<AddTrainingEvent>((event, emit) async {
       if (state is NewTraining) {

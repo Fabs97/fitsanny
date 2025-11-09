@@ -29,6 +29,10 @@ class AppBottomBar extends StatelessWidget {
                     icon: Icon(Icons.fitness_center),
                     onPressed: () => context.go('/training'),
                   ),
+                  IconButton(
+                    icon: Icon(Icons.edit_note),
+                    onPressed: () => context.go('/log'),
+                  ),
                 ],
               ),
             ),

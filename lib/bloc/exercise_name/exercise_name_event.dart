@@ -7,7 +7,23 @@ abstract class ExerciseNameEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class LoadExerciseNamesEvent extends ExerciseNameEvent {}
+class LoadExerciseNamesEvent extends ExerciseNameEvent {
+  final List<int> ids;
+
+  const LoadExerciseNamesEvent({this.ids = const <int>[]});
+
+  @override
+  List<Object?> get props => [ids];
+}
+
+class LoadedExerciseNamesEvent extends ExerciseNameEvent {
+  final List<ExerciseName> names;
+
+  const LoadedExerciseNamesEvent({required this.names});
+
+  @override
+  List<Object?> get props => [names];
+}
 
 class AddExerciseNameEvent extends ExerciseNameEvent {
   final String name;

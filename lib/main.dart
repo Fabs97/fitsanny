@@ -1,6 +1,7 @@
 import 'package:fitsanny/app.dart';
 import 'package:fitsanny/bloc/database/database_bloc.dart';
 import 'package:fitsanny/bloc/exercise_name/exercise_name_bloc.dart';
+import 'package:fitsanny/bloc/log/log_bloc.dart';
 import 'package:fitsanny/bloc/training/training_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
               providers: [
                 TrainingProvider.provider,
                 ExerciseNamesProvider.provider,
+                LogProvider.provider,
               ],
               child: App(),
             );

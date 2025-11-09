@@ -1,4 +1,10 @@
-enum DatabaseTablesEnum { training, exerciseName, exercise, trainingExercise }
+enum DatabaseTablesEnum {
+  training,
+  exerciseName,
+  exercise,
+  trainingExercise,
+  log,
+}
 
 String getDatabaseTable(DatabaseTablesEnum table) {
   switch (table) {
@@ -10,5 +16,7 @@ String getDatabaseTable(DatabaseTablesEnum table) {
       return "exercise";
     case DatabaseTablesEnum.trainingExercise:
       return "training_exercises";
+    case DatabaseTablesEnum.log:
+      return 'log';
   }
 }

@@ -5,7 +5,7 @@ abstract class TrainingEvent extends Equatable {
   const TrainingEvent({this.onComplete});
 
   @override
-  List<Object> get props => [];
+  List<Object> get props => [onComplete != null];
 }
 
 //Event Designed for READING The Elements

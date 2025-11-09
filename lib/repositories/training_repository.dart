@@ -74,4 +74,14 @@ class TrainingRepository {
 
     return trainings;
   }
+
+  Future<bool> deleteTraining(int id) async {
+    final rowsAffected = await _database.delete(
+      getDatabaseTable(DatabaseTablesEnum.training),
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+
+    return rowsAffected == 1;
+  }
 }

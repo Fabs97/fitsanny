@@ -23,11 +23,11 @@ class AddTrainingEvent extends TrainingEvent {
 
 //Event Designed for DELETING The Elements
 class RemoveTrainingEvent extends TrainingEvent {
-  final Training training;
-  const RemoveTrainingEvent(this.training);
+  final int id;
+  const RemoveTrainingEvent(this.id);
 
   @override
-  List<Object> get props => [training];
+  List<Object> get props => [id];
 }
 
 //Event Designed for UPDATING The Elements

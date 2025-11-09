@@ -15,6 +15,9 @@ class TrainingsLoaded extends TrainingState {
   final List<Training> trainings;
 
   const TrainingsLoaded(this.trainings);
+
+  @override
+  List<Object> get props => [trainings];
 }
 
 class NewTraining extends TrainingState {
@@ -35,9 +38,15 @@ class NewTraining extends TrainingState {
       exerciseNameId: exerciseNameId,
     );
   }
+
+  @override
+  List<Object> get props => [newTraining];
 }
 
 class TrainingsError extends TrainingState {
   final String message;
   const TrainingsError(this.message) : super();
+
+  @override
+  List<Object> get props => [message];
 }

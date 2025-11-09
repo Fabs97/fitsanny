@@ -29,10 +29,35 @@ class TrainingsView extends StatelessWidget {
                 child: Column(
                   children: [
                     for (var training in state.trainings)
-                      ListTile(
-                        title: Text(training.title),
-                        subtitle: Text(
-                          'Exercises: ${training.exercises.length}',
+                      Dismissible(
+                        key: Key(training.id.toString()),
+                        onDismissed: (direction) {
+                          if (direction == DismissDirection.endToStart) {
+                            // deleted
+                            context.read<TrainingBloc>().add(
+                              RemoveTrainingEvent(training.id!),
+                            );
+                          }
+                        },
+                        background: Container(
+                          color: Colors.red,
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 16.0),
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: Icon(
+                                Icons.delete,
+                                size: 32.0,
+                                color: Colors.white70,
+                              ),
+                            ),
+                          ),
+                        ),
+                        child: ListTile(
+                          title: Text(training.title),
+                          subtitle: Text(
+                            'Exercises: ${training.exercises.length}',
+                          ),
                         ),
                       ),
                   ],

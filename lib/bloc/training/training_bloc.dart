@@ -36,6 +36,15 @@ class TrainingBloc extends Bloc<TrainingEvent, TrainingState> {
         }
       }
     });
+    on<RemoveTrainingEvent>((event, emit) async {
+      try {
+        await _trainingRepository.deleteTraining(event.id);
+        final trainings = await _trainingRepository.getTrainings();
+        emit(TrainingsLoaded(trainings));
+      } catch (e) {
+        print(e); //TODO - Snackbar
+      }
+    });
   }
 }
 

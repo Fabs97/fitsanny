@@ -29,11 +29,16 @@ class LogBloc extends Bloc<LogEvent, LogState> {
     on<AddLogsEvent>((event, emit) async {
       try {
         emit(LogsLoading());
-        final newLog = await _logRepository.insertLog(event.log);
-        event.onComplete?.call(true, data: newLog);
+
+        final newLogs = await _logRepository.insertLogs(event.logs);
+        event.onComplete?.call(true, data: newLogs);
       } catch (e) {
         event.onComplete?.call(false);
-        emit(LogError('Failed to add ${event.log.toString()}}'));
+        emit(
+          LogError(
+            'Failed to add logs ${event.logs.map((l) => l.toString())}}',
+          ),
+        );
       }
     });
   }

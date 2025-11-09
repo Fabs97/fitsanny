@@ -1,5 +1,7 @@
 import 'package:fitsanny/bloc/exercise_name/exercise_name_bloc.dart';
+import 'package:fitsanny/bloc/log/log_bloc.dart';
 import 'package:fitsanny/components/form_stepper.dart';
+import 'package:fitsanny/model/log.dart';
 import 'package:fitsanny/model/training.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -83,7 +85,20 @@ class _LoggerDetailsState extends State<LoggerDetails> {
 
           ElevatedButton(
             onPressed: () {
-              print('saving performance');
+              context.read<LogBloc>().add(
+                AddLogsEvent(
+                  widget.training.exercises
+                      .map(
+                        (e) => Log(
+                          trainingId: widget.training.id!,
+                          exerciseId: e.id!,
+                          kgs: e.kgs,
+                          reps: e.reps,
+                        ),
+                      )
+                      .toList(),
+                ),
+              );
             },
             child: Text('Save performance'),
           ),

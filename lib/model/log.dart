@@ -14,7 +14,7 @@ class Log extends Equatable {
     required this.exerciseId,
     required this.reps,
     required this.kgs,
-    required this.createdAt,
+    this.createdAt,
   });
 
   factory Log.fromJson(Map<String, dynamic> json) => Log(

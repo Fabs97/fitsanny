@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:fitsanny/model/log.dart';
 import 'package:fitsanny/utils/database_constants.dart';
 import 'package:sqflite/sqflite.dart';
@@ -24,5 +26,23 @@ class LogRepository {
       conflictAlgorithm: ConflictAlgorithm.fail,
     );
     return log.copyWith(id: newLogId);
+  }
+
+  Future<List<Log>> insertLogs(List<Log> logs) async {
+    final List<Log> logs = [];
+    await _database.transaction((txn) async {
+      for (final log in logs) {
+        logs.add(
+          log.copyWith(
+            id: await txn.insert(
+              getDatabaseTable(DatabaseTablesEnum.log),
+              log.toMap(),
+              conflictAlgorithm: ConflictAlgorithm.fail,
+            ),
+          ),
+        );
+      }
+    });
+    return logs;
   }
 }

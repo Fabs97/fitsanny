@@ -16,10 +16,18 @@ class LoadLogsEvent extends LogEvent {
   List<Object> get props => [trainingId, ...super.props];
 }
 
-class AddLogsEvent extends LogEvent {
+class AddLogEvent extends LogEvent {
   final Log log;
-  const AddLogsEvent(this.log, {super.onComplete});
+  const AddLogEvent(this.log, {super.onComplete});
 
   @override
   List<Object> get props => [log, ...super.props];
+}
+
+class AddLogsEvent extends LogEvent {
+  final List<Log> logs;
+  const AddLogsEvent(this.logs, {super.onComplete});
+
+  @override
+  List<Object> get props => [logs, ...super.props];
 }

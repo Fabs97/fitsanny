@@ -53,8 +53,9 @@ class TrainingRepository {
     List<Training> trainings = [];
     for (var trainingMap in trainingMaps) {
       final List<Map<String, dynamic>> exerciseMaps = await _database.rawQuery(
-        'SELECT e.* FROM ${getDatabaseTable(DatabaseTablesEnum.exercise)} e '
-        'JOIN ${getDatabaseTable(DatabaseTablesEnum.trainingExercise)} te ON e.id = te.exercise_id '
+        'SELECT e.*, en.name FROM ${getDatabaseTable(DatabaseTablesEnum.exercise)} e '
+        'LEFT JOIN ${getDatabaseTable(DatabaseTablesEnum.exerciseName)} en ON e.exercise_name_id = en.id '
+        'LEFT JOIN ${getDatabaseTable(DatabaseTablesEnum.trainingExercise)} te ON e.id = te.exercise_id '
         'WHERE te.training_id = ?',
         [trainingMap['id']],
       );

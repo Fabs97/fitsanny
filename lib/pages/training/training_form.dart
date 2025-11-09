@@ -75,7 +75,18 @@ class _TrainingFormState extends State<TrainingForm> {
                   ElevatedButton(
                     onPressed: () {
                       context.read<TrainingBloc>().add(
-                        AddTrainingEvent(state.newTraining),
+                        AddTrainingEvent(
+                          state.newTraining,
+                          onComplete: (success) {
+                            if (success && context.mounted) {
+                              context.go('/training');
+                            }
+                            if (!success) {
+                              // TODO: add snackbar
+                              print("Error adding a training");
+                            }
+                          },
+                        ),
                       );
                     },
                     child: Text('Save'),

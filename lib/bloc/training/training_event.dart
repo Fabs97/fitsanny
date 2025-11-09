@@ -1,7 +1,8 @@
 part of 'training_bloc.dart';
 
 abstract class TrainingEvent extends Equatable {
-  const TrainingEvent();
+  final void Function(bool success)? onComplete;
+  const TrainingEvent({this.onComplete});
 
   @override
   List<Object> get props => [];
@@ -10,12 +11,14 @@ abstract class TrainingEvent extends Equatable {
 //Event Designed for READING The Elements
 class LoadTrainingsEvent extends TrainingEvent {}
 
-class NewTrainingEvent extends TrainingEvent {}
+class NewTrainingEvent extends TrainingEvent {
+  const NewTrainingEvent();
+}
 
 //Event Designed for CREATING New Elements
 class AddTrainingEvent extends TrainingEvent {
   final Training training;
-  const AddTrainingEvent(this.training);
+  const AddTrainingEvent(this.training, {super.onComplete});
 
   @override
   List<Object> get props => [training];
@@ -24,7 +27,7 @@ class AddTrainingEvent extends TrainingEvent {
 //Event Designed for DELETING The Elements
 class RemoveTrainingEvent extends TrainingEvent {
   final int id;
-  const RemoveTrainingEvent(this.id);
+  const RemoveTrainingEvent(this.id, {super.onComplete});
 
   @override
   List<Object> get props => [id];

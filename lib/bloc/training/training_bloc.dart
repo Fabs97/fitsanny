@@ -31,7 +31,9 @@ class TrainingBloc extends Bloc<TrainingEvent, TrainingState> {
           await _trainingRepository.insertTraining(event.training);
           final trainings = await _trainingRepository.getTrainings();
           emit(TrainingsLoaded(trainings));
+          event.onComplete?.call(true);
         } catch (e) {
+          event.onComplete?.call(false);
           print(e); //TODO - Snackbar
         }
       }

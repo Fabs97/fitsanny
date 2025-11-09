@@ -31,7 +31,7 @@ class TrainingsView extends StatelessWidget {
                     for (var training in state.trainings)
                       Dismissible(
                         key: Key(training.id.toString()),
-                        onDismissed: (direction) {
+                        onDismissed: (direction) async {
                           if (direction == DismissDirection.endToStart) {
                             // deleted
                             context.read<TrainingBloc>().add(

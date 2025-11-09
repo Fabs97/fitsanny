@@ -44,6 +44,8 @@ class DatabaseBloc extends Bloc<DatabaseEvent, DatabaseState> {
             createExerciseTableQuery,
             createTrainingTableQuery,
             createTrainingExercisesTableQuery,
+            createLoggerTableQuery,
+            createSetTableQuery,
           ].map((e) async => await db.execute(e)).toList();
         },
       );

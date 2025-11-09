@@ -1,5 +1,7 @@
 import 'package:fitsanny/pages/home/home.dart';
-import 'package:fitsanny/pages/logger/logger.dart';
+import 'package:fitsanny/pages/logger/logger_details.dart';
+import 'package:fitsanny/pages/logger/logger_home.dart';
+import 'package:fitsanny/pages/logger/logger_shell_router.dart';
 import 'package:fitsanny/pages/training/training_form.dart';
 import 'package:fitsanny/pages/training/training_home.dart';
 import 'package:fitsanny/shell_route_builder.dart';
@@ -28,7 +30,21 @@ final _router = GoRouter(
             ),
           ],
         ),
-        GoRoute(path: '/log', builder: (context, state) => const Logger()),
+        ShellRoute(
+          builder: loggerShellRouterBuilder,
+          routes: [
+            GoRoute(
+              path: '/log',
+              builder: (context, state) => const LoggerHome(),
+              routes: [
+                GoRoute(
+                  path: '/new',
+                  builder: (context, state) => const LoggerDetails(),
+                ),
+              ],
+            ),
+          ],
+        ),
       ],
     ),
   ],

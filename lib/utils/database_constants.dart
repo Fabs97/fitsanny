@@ -4,6 +4,7 @@ enum DatabaseTablesEnum {
   exercise,
   trainingExercise,
   log,
+  set,
 }
 
 String getDatabaseTable(DatabaseTablesEnum table) {
@@ -18,5 +19,7 @@ String getDatabaseTable(DatabaseTablesEnum table) {
       return "training_exercises";
     case DatabaseTablesEnum.log:
       return 'log';
+    case DatabaseTablesEnum.set:
+      return 'sets';
   }
 }

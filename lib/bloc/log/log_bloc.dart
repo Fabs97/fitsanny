@@ -16,7 +16,9 @@ class LogBloc extends Bloc<LogEvent, LogState> {
     on<LoadLogsEvent>((event, emit) async {
       try {
         emit(LogsLoading());
-        final logs = await _logRepository.getLogsForTraining(event.trainingId);
+        final logs = await _logRepository.getLatestLogsForTraining(
+          event.trainingId,
+        );
         emit(LogsLoaded(logs));
         event.onComplete?.call(true);
       } catch (e) {

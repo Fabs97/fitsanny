@@ -31,7 +31,7 @@ final String createTrainingExercisesTableQuery =
 CREATE TABLE ${getDatabaseTable(DatabaseTablesEnum.trainingExercise)}(
   training_id INTEGER,
   exercise_id INTEGER,
-  FOREIGN KEY(training_id) REFERENCES ${getDatabaseTable(DatabaseTablesEnum.training)}(id),
+  FOREIGN KEY(training_id) REFERENCES ${getDatabaseTable(DatabaseTablesEnum.training)}(id) ON DELETE CASCADE,
   FOREIGN KEY(exercise_id) REFERENCES ${getDatabaseTable(DatabaseTablesEnum.exercise)}(id)
 )
 ''';
@@ -41,7 +41,7 @@ CREATE TABLE ${getDatabaseTable(DatabaseTablesEnum.log)}(
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   training_id INTEGER,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY(training_id) REFERENCES ${getDatabaseTable(DatabaseTablesEnum.training)}(id)
+  FOREIGN KEY(training_id) REFERENCES ${getDatabaseTable(DatabaseTablesEnum.training)}(id) ON DELETE CASCADE
 )
 ''';
 final String createSetTableQuery =

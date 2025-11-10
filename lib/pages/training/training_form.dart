@@ -74,6 +74,7 @@ class _TrainingFormState extends State<TrainingForm> {
                   ),
                   ElevatedButton(
                     onPressed: () {
+                      print(state.newTraining);
                       context.read<TrainingBloc>().add(
                         AddTrainingEvent(
                           state.newTraining,

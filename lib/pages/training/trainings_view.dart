@@ -26,6 +26,7 @@ class TrainingsView extends StatelessWidget {
                     child: SingleChildScrollView(
                       child: Column(
                         mainAxisSize: MainAxisSize.max,
+                        spacing: 8.0,
                         children: [
                           for (var training in state.trainings)
                             Dismissible(
@@ -52,10 +53,21 @@ class TrainingsView extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              child: ListTile(
-                                title: Text(training.title),
-                                subtitle: Text(
-                                  'Exercises: ${training.exercises.length}',
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(8.0),
+                                  ),
+                                  border: Border.all(
+                                    style: BorderStyle.solid,
+                                    width: 1.0,
+                                  ),
+                                ),
+                                child: ListTile(
+                                  title: Text(training.title),
+                                  subtitle: Text(
+                                    'Exercises: ${training.exercises.length}',
+                                  ),
                                 ),
                               ),
                             ),

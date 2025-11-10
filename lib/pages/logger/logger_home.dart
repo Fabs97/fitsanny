@@ -7,7 +7,7 @@ class LoggerHome extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Text(
-        'Choose a training to create a log',
+        'Have we hit the gym today already?',
         style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: 1.5),
       ),
     );

@@ -31,10 +31,12 @@ Widget loggerShellRouterBuilder(
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   SearchAnchor(
+                    viewHintText: 'Choose a training...',
                     builder:
                         (BuildContext context, SearchController controller) {
                           return SearchBar(
                             controller: controller,
+                            hintText: 'Choose a training...',
                             padding: WidgetStatePropertyAll(
                               const EdgeInsets.symmetric(horizontal: 8.0),
                             ),

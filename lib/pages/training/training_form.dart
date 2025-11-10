@@ -19,8 +19,8 @@ class _TrainingFormState extends State<TrainingForm> {
 
   @override
   void initState() {
-    context.read<ExerciseNameBloc>().add(LoadExerciseNamesEvent());
     super.initState();
+    context.read<ExerciseNameBloc>().add(LoadExerciseNamesEvent());
   }
 
   @override

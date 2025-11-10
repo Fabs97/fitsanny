@@ -10,10 +10,6 @@ part 'logger_state.dart';
 class LoggerBloc extends Bloc<LoggerEvent, LoggerState> {
   LoggerBloc() : super(UnchosenTraining()) {
     on<ChooseTraining>((event, emit) async {
-      // Do not perform navigation from the bloc. Navigation requires a
-      // BuildContext that has GoRouter in its widget tree. The UI that
-      // dispatches ChooseTraining should also trigger loading logs and
-      // perform navigation using its own context.
       emit(ChosenTraining(training: event.training));
     });
   }

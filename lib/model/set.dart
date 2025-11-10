@@ -3,14 +3,14 @@ import 'package:equatable/equatable.dart';
 class Set extends Equatable {
   final int? id;
   final int exerciseId;
-  final int logId;
+  final int? logId;
   final int reps;
   final double kgs;
 
   const Set({
     this.id,
     required this.exerciseId,
-    required this.logId,
+    this.logId,
     required this.reps,
     required this.kgs,
   });

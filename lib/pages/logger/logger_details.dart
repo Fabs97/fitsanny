@@ -1,7 +1,9 @@
+import 'package:collection/collection.dart';
 import 'package:fitsanny/bloc/log/log_bloc.dart';
-import 'package:fitsanny/components/form_stepper.dart';
 import 'package:fitsanny/model/log.dart';
+import 'package:fitsanny/model/set.dart';
 import 'package:fitsanny/pages/logger/logger_bloc.dart';
+import 'package:fitsanny/pages/logger/logger_set_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -18,7 +20,33 @@ class _LoggerDetailsState extends State<LoggerDetails> {
   late Log log;
 
   @override
+  void initState() {
+    super.initState();
+    LogState currentLogState = BlocProvider.of<LogBloc>(context).state;
+    LoggerState currentLoggerState = BlocProvider.of<LoggerBloc>(context).state;
+
+    if (currentLogState is LogsLoaded) {
+      final logs = currentLogState.logs;
+
+      log = Log(
+        trainingId: currentLoggerState.training!.id!,
+        sets: logs.isEmpty
+            // No logs available yet
+            ? currentLoggerState.training!.exercises
+                  .map((e) => Set(exerciseId: e.id!, reps: 1, kgs: 5.0))
+                  .toList()
+            : logs.first.sets,
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final Map<int, List<Set>> setsGroupedByExerciseId = groupBy<Set, int>(
+      log.sets,
+      (Set set) => set.exerciseId,
+    );
+
     return Padding(
       padding: const EdgeInsets.only(top: 8.0),
       child: BlocBuilder<LoggerBloc, LoggerState>(
@@ -29,21 +57,21 @@ class _LoggerDetailsState extends State<LoggerDetails> {
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                SingleChildScrollView(
-                  child: BlocBuilder<LogBloc, LogState>(
-                    builder: (context, state) {
-                      if (state is LogsLoading) {
-                        return Center(child: CircularProgressIndicator());
-                      }
-                      if (state is! LogsLoaded) {
-                        return Center(
-                          child: Text(
-                            'LoggerDetails::build - Wrong event type : ${state.runtimeType}',
-                          ),
-                        );
-                      }
-                      if (loggerState is ChosenTraining) {
-                        return Column(
+                BlocBuilder<LogBloc, LogState>(
+                  builder: (context, state) {
+                    if (state is LogsLoading) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                    if (state is! LogsLoaded) {
+                      return Center(
+                        child: Text(
+                          'LoggerDetails::build - Wrong event type : ${state.runtimeType}',
+                        ),
+                      );
+                    }
+                    if (loggerState is ChosenTraining) {
+                      return SingleChildScrollView(
+                        child: Column(
                           mainAxisSize: MainAxisSize.max,
                           spacing: 8.0,
                           children: [
@@ -64,29 +92,19 @@ class _LoggerDetailsState extends State<LoggerDetails> {
                                       mainAxisSize: MainAxisSize.max,
                                       children: [
                                         Text(exercise.exerciseName!),
-                                        ...(state.logs.isEmpty
-                                            // No logs available yet
-                                            ? [
-                                                _buildRow(
-                                                  0,
-                                                  exercise.reps,
-                                                  exercise.kgs,
+                                        ...setsGroupedByExerciseId[exercise.id]!
+                                            .asMap()
+                                            .map(
+                                              (idx, set) => MapEntry(
+                                                idx,
+                                                LoggerSetRow(
+                                                  idx: idx,
+                                                  reps: set.reps,
+                                                  kgs: set.kgs,
                                                 ),
-                                              ]
-                                            // No logs are already
-                                            : state.logs.first.sets
-                                                  .asMap()
-                                                  .map(
-                                                    (idx, s) => MapEntry(
-                                                      idx,
-                                                      _buildRow(
-                                                        idx,
-                                                        s.reps,
-                                                        s.kgs,
-                                                      ),
-                                                    ),
-                                                  )
-                                                  .values),
+                                              ),
+                                            )
+                                            .values,
                                       ],
                                     ),
                                   ),
@@ -94,16 +112,16 @@ class _LoggerDetailsState extends State<LoggerDetails> {
                               );
                             }).values,
                           ],
-                        );
-                      } else {
-                        return Center(
-                          child: Text(
-                            'LoggerDetails::build - LoggerState is wrong: ${loggerState.runtimeType}',
-                          ),
-                        );
-                      }
-                    },
-                  ),
+                        ),
+                      );
+                    } else {
+                      return Center(
+                        child: Text(
+                          'LoggerDetails::build - LoggerState is wrong: ${loggerState.runtimeType}',
+                        ),
+                      );
+                    }
+                  },
                 ),
 
                 ElevatedButton(
@@ -130,31 +148,6 @@ class _LoggerDetailsState extends State<LoggerDetails> {
           );
         },
       ),
-    );
-  }
-
-  Widget _buildRow(int idx, int reps, double kgs) {
-    return Row(
-      spacing: 8.0,
-      children: [
-        Expanded(
-          child: FormStepper(
-            name: 'kgs_$idx',
-            label: 'kgs',
-            step: 0.5,
-            initialValue: kgs,
-          ),
-        ),
-        Expanded(
-          child: FormStepper(
-            name: 'reps_$idx',
-            label: 'reps',
-            step: 1,
-            initialValue: reps,
-            isInteger: true,
-          ),
-        ),
-      ],
     );
   }
 }

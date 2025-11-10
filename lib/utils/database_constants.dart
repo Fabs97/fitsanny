@@ -23,3 +23,35 @@ String getDatabaseTable(DatabaseTablesEnum table) {
       return 'sets';
   }
 }
+
+List<String> baseExercises = [
+  // Upper body
+  'Bench Press',
+  'Incline Bench Press',
+  'Overhead Press',
+  'Push Up',
+  'Pull Up',
+  'Chin Up',
+  'Barbell Row',
+  'Dumbbell Row',
+  'Lat Pulldown',
+  'Bicep Curl',
+  'Tricep Extension',
+  'Lateral Raise',
+
+  // Lower body
+  'Squat',
+  'Front Squat',
+  'Deadlift',
+  'Romanian Deadlift',
+  'Leg Press',
+  'Lunge',
+  'Calf Raise',
+  'Hip Thrust',
+
+  // Core
+  'Plank',
+  'Crunch',
+  'Hanging Leg Raise',
+  'Russian Twist',
+];

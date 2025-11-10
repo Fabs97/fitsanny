@@ -13,6 +13,21 @@ class LogBloc extends Bloc<LogEvent, LogState> {
   LogBloc({required LogRepository repository})
     : _logRepository = repository,
       super(LogInitial()) {
+    on<LoadLogsTimeSpanEvent>((event, emit) async {
+      try {
+        emit(LogsLoading());
+        final logs = await _logRepository.getLogsBetween(
+          event.startTime,
+          event.endTime,
+        );
+        emit(LogsLoaded(logs));
+        event.onComplete?.call(true);
+      } catch (e) {
+        print(e);
+        event.onComplete?.call(false);
+        emit(LogError('Failed to load logs with time range'));
+      }
+    });
     on<LoadLogsEvent>((event, emit) async {
       try {
         emit(LogsLoading());

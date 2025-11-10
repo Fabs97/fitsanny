@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:fitsanny/utils/database_constants.dart';
 import 'package:flutter/services.dart';
 import 'package:equatable/equatable.dart';
 import 'package:fitsanny/bloc/database/database_create_queries.dart';
@@ -51,6 +52,7 @@ class DatabaseBloc extends Bloc<DatabaseEvent, DatabaseState> {
       );
 
       await database?.execute('PRAGMA foreign_keys = ON');
+      await _insertDefaultExercises();
 
       emit(LoadedDatabaseState(database!));
     });
@@ -69,58 +71,30 @@ class DatabaseBloc extends Bloc<DatabaseEvent, DatabaseState> {
 
   Database? database;
 
-  // Future<void> insertExercise(ExerciseDto exercise) async {
-  //   final exerciseNameObj = await database.query(
-  //     'exercise_name',
-  //     where: 'name = ?',
-  //     whereArgs: [exercise.exerciseName],
-  //   );
+  Future<void> _insertDefaultExercises() async {
+    // Insert exercise names if they don’t already exist
+    for (final name in baseExercises) {
+      await database!.insert(
+        getDatabaseTable(DatabaseTablesEnum.exerciseName),
+        {'name': name},
+        conflictAlgorithm: ConflictAlgorithm.ignore, // avoids duplicates
+      );
+    }
 
-  //   await database.transaction((txn) async {
-  //     if (exerciseNameObj.isEmpty) {
-  //       await txn.insert('exercise_name', {
-  //         'name': exercise.exerciseName,
-  //       }, conflictAlgorithm: ConflictAlgorithm.ignore);
-  //     } else {
-  //       exercise = exercise.copyWith(
-  //         exerciseNameId: exerciseNameObj.first['id'] as int,
-  //       );
-  //     }
-  //     await txn.insert(
-  //       'exercise',
-  //       exercise.toExercise().toMap(),
-  //       conflictAlgorithm: ConflictAlgorithm.replace,
-  //     );
-  //   });
-  // }
+    // Optionally, insert base exercises (empty stats) to the exercise table
+    final existingNames = await database!.query(
+      getDatabaseTable(DatabaseTablesEnum.exerciseName),
+    );
+    for (final e in existingNames) {
+      await database!.insert(
+        getDatabaseTable(DatabaseTablesEnum.exercise),
+        {'exercise_name_id': e['id'], 'reps': 0, 'kgs': 0.0},
+        conflictAlgorithm: ConflictAlgorithm.ignore,
+      );
+    }
 
-  // Future<void> addExerciseToTraining(int exerciseId, int trainingId) async {
-  //   await database.insert('training_exercises', {
-  //     'training_id': trainingId,
-  //     'exercise_id': exerciseId,
-  //   }, conflictAlgorithm: ConflictAlgorithm.replace);
-  // }
-
-  // Future<void> deleteTraining(int id) async {
-  //   await database.transaction((txn) async {
-  //     await txn.execute('DELETE FROM training WHERE id = ?', [id]);
-  //     await txn.execute(
-  //       'DELETE FROM training_exercises WHERE training_id = ?',
-  //       [id],
-  //     );
-  //   });
-  // }
-
-  // Future<void> deleteExerciseFromTraining(
-  //   int exerciseId,
-  //   int trainingId,
-  // ) async {
-  //   await database.delete(
-  //     'training_exercises',
-  //     where: 'training_id = ? AND exercise_id = ?',
-  //     whereArgs: [trainingId, exerciseId],
-  //   );
-  // }
+    print('✅ Default exercises inserted (${baseExercises.length})');
+  }
 }
 
 extension DatabaseProvider on DatabaseBloc {

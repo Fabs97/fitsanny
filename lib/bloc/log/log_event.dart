@@ -8,6 +8,16 @@ abstract class LogEvent extends Equatable {
   List<Object> get props => [onComplete != null];
 }
 
+class LoadLogsTimeSpanEvent extends LogEvent {
+  late final DateTime startTime;
+  late final DateTime endTime;
+
+  LoadLogsTimeSpanEvent({super.onComplete, DateTime? start, DateTime? end}) {
+    endTime = end ?? DateTime.now();
+    startTime = start ?? endTime.subtract(Duration(days: 7));
+  }
+}
+
 class LoadLogsEvent extends LogEvent {
   final int trainingId;
   const LoadLogsEvent(this.trainingId, {super.onComplete});

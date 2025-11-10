@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:fitsanny/model/set.dart';
 import 'package:fitsanny/model/log.dart';
 import 'package:fitsanny/utils/database_constants.dart';
+import 'package:fitsanny/utils/logs_utils.dart';
 import 'package:sqflite/sqflite.dart';
 
 class LogRepository {
@@ -32,43 +33,99 @@ class LogRepository {
         WHERE training_id = $trainingId
       )
     ''');
-    final Map<int, Log> logsMap = {};
-    for (final row in rows) {
-      final int logId = int.parse(row['log_id'] as String);
-      if (logsMap.keys.contains(logId)) {
-        // add another set
-        final Log log = logsMap[logId]!;
-        logsMap[logId] = log.copyWith(
-          sets: [
-            ...log.sets,
-            Set(
-              id: int.tryParse(row['set_id'] as String),
-              exerciseId: int.tryParse(row['set_exercise_id'] as String)!,
-              logId: logId,
-              reps: int.tryParse(row['set_reps'] as String)!,
-              kgs: double.tryParse(row['set_kgs'] as String)!,
-            ),
-          ],
-        );
-      } else {
-        logsMap[logId] = Log(
-          id: int.tryParse(logId as String),
-          trainingId: trainingId,
-          createdAt: DateTime.tryParse(row['created_at'] as String),
-          sets: [
-            Set(
-              id: int.tryParse(row['set_id'] as String),
-              exerciseId: int.tryParse(row['set_exercise_id'] as String)!,
-              logId: logId,
-              reps: int.tryParse(row['set_reps'] as String)!,
-              kgs: double.tryParse(row['set_kgs'] as String)!,
-            ),
-          ],
-        );
-      }
+
+    return fromLogsWithSetMapToFlutterClasses(rows);
+  }
+
+  Future<List<Log>> getLogsBetween(
+    DateTime start,
+    DateTime end, {
+    String? exerciseName,
+  }) async {
+    // final rows = await _database.rawQuery(
+    //       '''
+    //     SELECT
+    //       l.id AS log_id,
+    //       l.training_id,
+    //       l.created_at,
+    //       s.id AS set_id,
+    //       s.exercise_id AS set_exercise_id,
+    //       s.reps AS set_reps,
+    //       s.kgs AS set_kgs
+    //     FROM
+    //       ${getDatabaseTable(DatabaseTablesEnum.log)} l
+    //     JOIN
+    //       ${getDatabaseTable(DatabaseTablesEnum.set)} s ON s.log_id = l.id
+    //     WHERE
+    //       l.created_at BETWEEN ? AND ?
+    // ''',
+    //       [
+    //         start.toIso8601String().substring(0, 19).replaceFirst('T', ' '),
+    //         end.toIso8601String().substring(0, 19).replaceFirst('T', ' '),
+    //       ],
+    //     );
+    // Convert DateTime → SQLite-compatible string format
+    final startStr = start
+        .toIso8601String()
+        .substring(0, 19)
+        .replaceFirst('T', ' ');
+    final endStr = end
+        .toIso8601String()
+        .substring(0, 19)
+        .replaceFirst('T', ' ');
+
+    // Base query parts
+    final logTable = getDatabaseTable(DatabaseTablesEnum.log);
+    final setTable = getDatabaseTable(DatabaseTablesEnum.set);
+    final exerciseTable = getDatabaseTable(DatabaseTablesEnum.exercise);
+    final exerciseNameTable = getDatabaseTable(DatabaseTablesEnum.exerciseName);
+
+    final baseSelect = '''
+    SELECT
+      l.id AS log_id,
+      l.training_id,
+      l.created_at,
+      s.id AS set_id,
+      s.exercise_id AS set_exercise_id,
+      s.reps AS set_reps,
+      s.kgs AS set_kgs
+  ''';
+
+    final baseFrom =
+        '''
+    FROM $logTable l
+    JOIN $setTable s ON s.log_id = l.id
+  ''';
+
+    // Optional join + where parts
+    String joinClause = '';
+    String whereClause = 'WHERE l.created_at BETWEEN ? AND ?';
+    final whereArgs = [startStr, endStr];
+
+    if (exerciseName != null && exerciseName.isNotEmpty) {
+      joinClause =
+          '''
+      JOIN $exerciseTable e ON s.exercise_id = e.id
+      JOIN $exerciseNameTable en ON e.exercise_name_id = en.id
+    ''';
+      whereClause += ' AND LOWER(en.name) = ?';
+      whereArgs.add(exerciseName);
     }
 
-    return logsMap.values.toList();
+    final orderBy = 'ORDER BY l.created_at DESC';
+
+    final sql =
+        '''
+    $baseSelect
+    $baseFrom
+    $joinClause
+    $whereClause
+    $orderBy
+  ''';
+
+    final rows = await _database.rawQuery(sql, whereArgs);
+
+    return fromLogsWithSetMapToFlutterClasses(rows);
   }
 
   Future<Log> insertLog(Log log) async {

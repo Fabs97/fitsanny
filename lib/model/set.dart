@@ -23,6 +23,12 @@ class Set extends Equatable {
     kgs: json['kgs'],
   );
 
+  factory Set.empty({
+    required int exerciseId,
+    int reps = 1,
+    double kgs = 5.0,
+  }) => Set(exerciseId: exerciseId, reps: reps, kgs: kgs);
+
   Map<String, Object?> toMap() {
     return {
       'id': id,

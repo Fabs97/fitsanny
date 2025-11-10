@@ -76,7 +76,7 @@ Widget loggerShellRouterBuilder(
                           );
                         },
                   ),
-                  child,
+                  Expanded(child: child),
                 ],
               );
             },

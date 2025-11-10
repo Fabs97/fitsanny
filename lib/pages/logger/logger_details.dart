@@ -105,6 +105,21 @@ class _LoggerDetailsState extends State<LoggerDetails> {
                                               ),
                                             )
                                             .values,
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              log = log.copyWith(
+                                                sets: [
+                                                  ...log.sets,
+                                                  Set.empty(
+                                                    exerciseId: exercise.id!,
+                                                  ),
+                                                ],
+                                              );
+                                            });
+                                          },
+                                          child: Text('Add one more set!'),
+                                        ),
                                       ],
                                     ),
                                   ),

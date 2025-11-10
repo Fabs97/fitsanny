@@ -77,7 +77,11 @@ class _TrainingFormState extends State<TrainingForm> {
                       print(state.newTraining);
                       context.read<TrainingBloc>().add(
                         AddTrainingEvent(
-                          state.newTraining,
+                          state.newTraining.copyWith(
+                            title:
+                                _formKey.currentState?.fields['title']!.value ??
+                                state.newTraining.title,
+                          ),
                           onComplete: (success) {
                             if (success && context.mounted) {
                               context.go('/training');

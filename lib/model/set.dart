@@ -32,8 +32,8 @@ class Set extends Equatable {
   Map<String, Object?> toMap() {
     return {
       'id': id,
-      'exerciseId': exerciseId,
-      'logId': logId,
+      'exercise_id': exerciseId,
+      'log_id': logId,
       'reps': reps,
       'kgs': kgs,
     };

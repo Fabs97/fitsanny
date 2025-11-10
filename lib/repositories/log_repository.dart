@@ -15,9 +15,6 @@ class LogRepository {
     SELECT
       l.id AS log_id,
       l.training_id,
-      l.exercise_id,
-      l.reps AS log_reps,
-      l.kgs AS log_kgs,
       l.created_at,
       s.id AS set_id,
       s.exercise_id AS set_exercise_id,
@@ -84,7 +81,7 @@ class LogRepository {
   }
 
   Future<List<Log>> insertLogs(List<Log> logs) async {
-    final List<Log> logs = [];
+    final List<Log> newLogs = [];
     await _database.transaction((txn) async {
       for (Log log in logs) {
         log = log.copyWith(
@@ -95,19 +92,20 @@ class LogRepository {
           ),
         );
 
-        log.sets.map((Set set) async {
-          return set.copyWith(
-            id: await txn.insert(
-              getDatabaseTable(DatabaseTablesEnum.set),
-              set.copyWith(logId: log.id).toMap(),
-              conflictAlgorithm: ConflictAlgorithm.fail,
-            ),
+        final newSets = <Set>[];
+        for (final set in log.sets) {
+          final newSetId = await txn.insert(
+            getDatabaseTable(DatabaseTablesEnum.set),
+            set.copyWith(logId: log.id).toMap(),
+            conflictAlgorithm: ConflictAlgorithm.fail,
           );
-        });
+          newSets.add(set.copyWith(id: newSetId));
+        }
+        log = log.copyWith(sets: newSets);
 
-        logs.add(log);
+        newLogs.add(log);
       }
     });
-    return logs;
+    return newLogs;
   }
 }

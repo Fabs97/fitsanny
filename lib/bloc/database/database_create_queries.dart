@@ -41,8 +41,7 @@ CREATE TABLE ${getDatabaseTable(DatabaseTablesEnum.log)}(
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   training_id INTEGER,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY(training_id) REFERENCES ${getDatabaseTable(DatabaseTablesEnum.training)}(id),
-  FOREIGN KEY(exercise_id) REFERENCES ${getDatabaseTable(DatabaseTablesEnum.exercise)}(id)
+  FOREIGN KEY(training_id) REFERENCES ${getDatabaseTable(DatabaseTablesEnum.training)}(id)
 )
 ''';
 final String createSetTableQuery =

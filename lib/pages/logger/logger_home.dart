@@ -5,6 +5,11 @@ class LoggerHome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text('Choose a training to create a log'));
+    return Center(
+      child: Text(
+        'Choose a training to create a log',
+        style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: 1.5),
+      ),
+    );
   }
 }

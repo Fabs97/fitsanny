@@ -33,6 +33,7 @@ class LogBloc extends Bloc<LogEvent, LogState> {
         emit(LogsLoading());
 
         final newLogs = await _logRepository.insertLogs(event.logs);
+        emit(LogsLoaded(newLogs));
         event.onComplete?.call(true, data: newLogs);
       } catch (e) {
         event.onComplete?.call(false);

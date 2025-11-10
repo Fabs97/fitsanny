@@ -50,6 +50,8 @@ class DatabaseBloc extends Bloc<DatabaseEvent, DatabaseState> {
         },
       );
 
+      await database?.execute('PRAGMA foreign_keys = ON');
+
       emit(LoadedDatabaseState(database!));
     });
     on<CloseDatabaseEvent>((event, emit) async {

@@ -24,11 +24,7 @@ class Log extends Equatable {
   );
 
   Map<String, Object?> toMap() {
-    return {
-      'id': id,
-      'training_id': trainingId,
-      'created_at': createdAt.toString(),
-    };
+    return {'id': id, 'training_id': trainingId};
   }
 
   @override

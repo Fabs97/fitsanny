@@ -3,11 +3,14 @@ import 'package:flutter/material.dart';
 
 class LoggerSetRow extends StatelessWidget {
   final int idx;
+  final int exerciseId;
   final int reps;
   final double kgs;
+
   const LoggerSetRow({
     super.key,
     required this.idx,
+    required this.exerciseId,
     required this.reps,
     required this.kgs,
   });
@@ -21,7 +24,7 @@ class LoggerSetRow extends StatelessWidget {
         Text('Set #${idx + 1}'),
         Expanded(
           child: FormStepper(
-            name: 'kgs_$idx',
+            name: 'kgs_${exerciseId}_$idx',
             label: 'kgs',
             step: 0.5,
             initialValue: kgs,
@@ -29,7 +32,7 @@ class LoggerSetRow extends StatelessWidget {
         ),
         Expanded(
           child: FormStepper(
-            name: 'reps_$idx',
+            name: 'reps_${exerciseId}_$idx',
             label: 'reps',
             step: 1,
             initialValue: reps,

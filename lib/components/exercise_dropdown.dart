@@ -4,7 +4,6 @@ import 'package:fitsanny/pages/training/exercise_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:go_router/go_router.dart';
 
 class ExerciseDropdown extends StatefulWidget {
   const ExerciseDropdown({
@@ -37,52 +36,87 @@ class _ExerciseDropdownState extends State<ExerciseDropdown> {
             if (trainingState is NewTraining) {
               final currentExercise =
                   trainingState.newTraining.exercises[widget.exerciseIndex];
-              return FormBuilderDropdown<int>(
-                name: widget.name,
-                initialValue: currentExercise.exerciseNameId == 0
-                    ? null
-                    : currentExercise.exerciseNameId,
-                hint: const Text('Choose an exercise'),
-                items:
-                    exerciseNameState is ExerciseNamesLoaded &&
-                        exerciseNameState.exerciseNames.isNotEmpty
-                    ? [
-                        _buildCreateNewItem(context),
-                        ...exerciseNameState.exerciseNames.map(
-                          (exerciseName) => DropdownMenuItem<int>(
-                            value: exerciseName.id,
-                            child: Text(exerciseName.name),
+              // Show dropdown and a prominent create button next to it
+              return Row(
+                children: [
+                  Expanded(
+                    child: FormBuilderDropdown<int>(
+                      name: widget.name,
+                      initialValue: currentExercise.exerciseNameId == 0
+                          ? null
+                          : currentExercise.exerciseNameId,
+                      hint: const Text('Choose an exercise'),
+                      items:
+                          exerciseNameState is ExerciseNamesLoaded &&
+                              exerciseNameState.exerciseNames.isNotEmpty
+                          ? [
+                              ...exerciseNameState.exerciseNames.map(
+                                (exerciseName) => DropdownMenuItem<int>(
+                                  value: exerciseName.id,
+                                  child: Text(exerciseName.name),
+                                ),
+                              ),
+                            ]
+                          : exerciseNameState is ExerciseNamesLoaded &&
+                                exerciseNameState.exerciseNames.isEmpty
+                          ? [
+                              DropdownMenuItem(
+                                value: null,
+                                child: Text('No exercises available'),
+                              ),
+                            ]
+                          : [
+                              DropdownMenuItem(
+                                value: null,
+                                child: Text('Loading exercises...'),
+                              ),
+                            ],
+                      focusNode: dropDownFocus,
+                      isExpanded: true,
+                      onChanged: (int? value) {
+                        if (value != null) {
+                          // Dispatch an event to change the exercise selection in the NewTraining state
+                          context.read<TrainingBloc>().add(
+                            ChangeExerciseInNewTrainingEvent(
+                              index: widget.exerciseIndex,
+                              exerciseNameId: value,
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.add),
+                    label: const Text('Create'),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12.0,
+                        horizontal: 12.0,
+                      ),
+                    ),
+                    onPressed: () {
+                      // Open the create dialog and fill this row when done
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Create new exercise'),
+                          content: ExerciseForm(
+                            onComplete: (id) {
+                              context.read<TrainingBloc>().add(
+                                ChangeExerciseInNewTrainingEvent(
+                                  index: widget.exerciseIndex,
+                                  exerciseNameId: id,
+                                ),
+                              );
+                            },
                           ),
                         ),
-                      ]
-                    : exerciseNameState is ExerciseNamesLoaded &&
-                          exerciseNameState.exerciseNames.isEmpty
-                    ? [
-                        DropdownMenuItem(
-                          value: null,
-                          child: Text('No exercises available'),
-                        ),
-                        _buildCreateNewItem(context),
-                      ]
-                    : [
-                        DropdownMenuItem(
-                          value: null,
-                          child: Text('Loading exercises...'),
-                        ),
-                      ],
-                focusNode: dropDownFocus,
-                isExpanded: true,
-                onChanged: (int? value) {
-                  if (value != null) {
-                    // Dispatch an event to change the exercise selection in the NewTraining state
-                    context.read<TrainingBloc>().add(
-                      ChangeExerciseInNewTrainingEvent(
-                        index: widget.exerciseIndex,
-                        exerciseNameId: value,
-                      ),
-                    );
-                  }
-                },
+                      );
+                    },
+                  ),
+                ],
               );
             } else {
               return Center(
@@ -94,35 +128,6 @@ class _ExerciseDropdownState extends State<ExerciseDropdown> {
           },
         );
       },
-    );
-  }
-
-  DropdownMenuItem<int> _buildCreateNewItem(BuildContext context) {
-    return DropdownMenuItem<int>(
-      value: 0,
-      child: TextButton(
-        child: Text('Create'),
-        onPressed: () {
-          dropDownFocus.context!.pop();
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('Create new exercise'),
-              content: ExerciseForm(
-                onComplete: (id) {
-                  // After the new exercise is created, assign it to this row
-                  context.read<TrainingBloc>().add(
-                    ChangeExerciseInNewTrainingEvent(
-                      index: widget.exerciseIndex,
-                      exerciseNameId: id,
-                    ),
-                  );
-                },
-              ),
-            ),
-          );
-        },
-      ),
     );
   }
 }

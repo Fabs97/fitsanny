@@ -1,4 +1,4 @@
-package com.example.fitsanny
+package com.fabs.fitsanny
 
 import io.flutter.embedding.android.FlutterActivity
 

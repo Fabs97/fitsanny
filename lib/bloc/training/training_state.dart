@@ -21,12 +21,12 @@ class TrainingsLoaded extends TrainingState {
 }
 
 class NewTraining extends TrainingState {
-  final Training newTraining = Training(
-    title: 'New Training',
-    exercises: [Exercise.empty()],
-  );
+  final Training newTraining;
 
-  NewTraining();
+  NewTraining({Training? training})
+    : newTraining =
+          training ??
+          Training(title: 'New Training', exercises: [Exercise.empty()]);
 
   void addExercise({Exercise exercise = const Exercise.empty()}) {
     newTraining.exercises.add(exercise);
@@ -37,6 +37,10 @@ class NewTraining extends TrainingState {
     newTraining.exercises[index] = newTraining.exercises[index].copyWith(
       exerciseNameId: exerciseNameId,
     );
+  }
+
+  NewTraining copyWith({Training? training}) {
+    return NewTraining(training: training ?? newTraining);
   }
 
   @override

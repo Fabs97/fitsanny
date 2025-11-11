@@ -47,6 +47,35 @@ class TrainingBloc extends Bloc<TrainingEvent, TrainingState> {
         print(e); //TODO - Snackbar
       }
     });
+    on<AddExerciseToNewTrainingEvent>((event, emit) {
+      if (state is NewTraining) {
+        final currentState = state as NewTraining;
+        // Create a new list with the added exercise to ensure state equality is updated
+        final updatedExercises = [
+          ...currentState.newTraining.exercises,
+          event.exercise,
+        ];
+        final updatedTraining = currentState.newTraining.copyWith(
+          exercises: updatedExercises,
+        );
+        // Emit a new NewTraining state to trigger rebuild and preserve form state
+        emit(NewTraining(training: updatedTraining));
+      }
+    });
+    on<ChangeExerciseInNewTrainingEvent>((event, emit) {
+      if (state is NewTraining) {
+        final currentState = state as NewTraining;
+        final updatedExercises = [...currentState.newTraining.exercises];
+        if (event.index >= 0 && event.index < updatedExercises.length) {
+          updatedExercises[event.index] = updatedExercises[event.index]
+              .copyWith(exerciseNameId: event.exerciseNameId);
+          final updatedTraining = currentState.newTraining.copyWith(
+            exercises: updatedExercises,
+          );
+          emit(NewTraining(training: updatedTraining));
+        }
+      }
+    });
   }
 }
 

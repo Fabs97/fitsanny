@@ -67,9 +67,11 @@ class _TrainingFormState extends State<TrainingForm> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   ElevatedButton(
-                    onPressed: () => setState(() {
-                      state.addExercise();
-                    }),
+                    onPressed: () {
+                      context.read<TrainingBloc>().add(
+                        AddExerciseToNewTrainingEvent(),
+                      );
+                    },
                     child: Text('Add Exercise'),
                   ),
                   ElevatedButton(

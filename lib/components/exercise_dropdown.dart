@@ -35,8 +35,13 @@ class _ExerciseDropdownState extends State<ExerciseDropdown> {
         return BlocBuilder<TrainingBloc, TrainingState>(
           builder: (context, trainingState) {
             if (trainingState is NewTraining) {
+              final currentExercise =
+                  trainingState.newTraining.exercises[widget.exerciseIndex];
               return FormBuilderDropdown<int>(
                 name: widget.name,
+                initialValue: currentExercise.exerciseNameId == 0
+                    ? null
+                    : currentExercise.exerciseNameId,
                 hint: const Text('Choose an exercise'),
                 items:
                     exerciseNameState is ExerciseNamesLoaded &&
@@ -69,8 +74,13 @@ class _ExerciseDropdownState extends State<ExerciseDropdown> {
                 isExpanded: true,
                 onChanged: (int? value) {
                   if (value != null) {
-                    // changeExercise expects (index, exerciseNameId)
-                    trainingState.changeExercise(widget.exerciseIndex, value);
+                    // Dispatch an event to change the exercise selection in the NewTraining state
+                    context.read<TrainingBloc>().add(
+                      ChangeExerciseInNewTrainingEvent(
+                        index: widget.exerciseIndex,
+                        exerciseNameId: value,
+                      ),
+                    );
                   }
                 },
               );

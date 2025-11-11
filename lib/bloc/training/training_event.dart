@@ -41,3 +41,23 @@ class EditTrainingEvent extends TrainingEvent {
   @override
   List<Object> get props => [training];
 }
+
+class AddExerciseToNewTrainingEvent extends TrainingEvent {
+  final Exercise exercise;
+  const AddExerciseToNewTrainingEvent({this.exercise = const Exercise.empty()});
+
+  @override
+  List<Object> get props => [exercise];
+}
+
+class ChangeExerciseInNewTrainingEvent extends TrainingEvent {
+  final int index;
+  final int exerciseNameId;
+  const ChangeExerciseInNewTrainingEvent({
+    required this.index,
+    required this.exerciseNameId,
+  });
+
+  @override
+  List<Object> get props => [index, exerciseNameId];
+}

@@ -1,6 +1,8 @@
-# fitsanny
+# FitSanny
 
-A new Flutter project.
+![FitSannt](./assets/launcher/icon.png)
+
+Your fit fairy tracker
 
 ## Getting Started
 

@@ -47,13 +47,13 @@ class _ExerciseDropdownState extends State<ExerciseDropdown> {
                     exerciseNameState is ExerciseNamesLoaded &&
                         exerciseNameState.exerciseNames.isNotEmpty
                     ? [
+                        _buildCreateNewItem(context),
                         ...exerciseNameState.exerciseNames.map(
                           (exerciseName) => DropdownMenuItem<int>(
                             value: exerciseName.id,
                             child: Text(exerciseName.name),
                           ),
                         ),
-                        _buildCreateNewItem(context),
                       ]
                     : exerciseNameState is ExerciseNamesLoaded &&
                           exerciseNameState.exerciseNames.isEmpty
@@ -108,7 +108,17 @@ class _ExerciseDropdownState extends State<ExerciseDropdown> {
             context: context,
             builder: (context) => AlertDialog(
               title: const Text('Create new exercise'),
-              content: ExerciseForm(),
+              content: ExerciseForm(
+                onComplete: (id) {
+                  // After the new exercise is created, assign it to this row
+                  context.read<TrainingBloc>().add(
+                    ChangeExerciseInNewTrainingEvent(
+                      index: widget.exerciseIndex,
+                      exerciseNameId: id,
+                    ),
+                  );
+                },
+              ),
             ),
           );
         },

@@ -19,12 +19,17 @@ class ExerciseNameBloc extends Bloc<ExerciseNameEvent, ExerciseNamesState> {
     });
     on<AddExerciseNameEvent>((event, emit) async {
       try {
-        // Add the new exercise name
-        await _exerciseNameRepository.addExerciseName(event.name);
+        // Add the new exercise name and get inserted id
+        final insertedId = await _exerciseNameRepository.addExerciseName(
+          event.name,
+        );
 
         // Immediately fetch the updated list and emit new state
         final exerciseNames = await _exerciseNameRepository.getExerciseNames();
         emit(ExerciseNamesLoaded(exerciseNames));
+
+        // Notify caller about the newly created id
+        event.onComplete?.call(insertedId);
       } catch (e) {
         emit(ExerciseNamesError('Failed to add exercise name: $e'));
       }

@@ -4,7 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 class ExerciseForm extends StatefulWidget {
-  const ExerciseForm({super.key});
+  const ExerciseForm({super.key, this.onComplete});
+
+  final void Function(int id)? onComplete;
 
   @override
   State<ExerciseForm> createState() => _ExerciseFormState();
@@ -36,7 +38,13 @@ class _ExerciseFormState extends State<ExerciseForm> {
                       '';
                   if (name.isNotEmpty) {
                     context.read<ExerciseNameBloc>().add(
-                      AddExerciseNameEvent(name),
+                      AddExerciseNameEvent(
+                        name,
+                        onComplete: (id) {
+                          // propagate to optional callback passed by caller
+                          widget.onComplete?.call(id);
+                        },
+                      ),
                     );
                     Navigator.pop(
                       context,

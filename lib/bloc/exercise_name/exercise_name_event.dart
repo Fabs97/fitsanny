@@ -27,11 +27,12 @@ class LoadedExerciseNamesEvent extends ExerciseNameEvent {
 
 class AddExerciseNameEvent extends ExerciseNameEvent {
   final String name;
+  final void Function(int id)? onComplete;
 
-  const AddExerciseNameEvent(this.name);
+  const AddExerciseNameEvent(this.name, {this.onComplete});
 
   @override
-  List<Object?> get props => [name];
+  List<Object?> get props => [name, onComplete != null];
 }
 
 class RemoveExerciseNameEvent extends ExerciseNameEvent {

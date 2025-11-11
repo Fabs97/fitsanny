@@ -1,3 +1,5 @@
+import 'package:fitsanny/pages/home/charts/muscle_ups_chart/muscle_up_chart_bloc.dart';
+import 'package:fitsanny/pages/home/charts/muscle_ups_chart/muscle_ups_chart.dart';
 import 'package:fitsanny/pages/home/charts/pull_ups_chart/pull_up_chart_bloc.dart';
 import 'package:fitsanny/pages/home/charts/pull_ups_chart/pull_ups_chart.dart';
 import 'package:flutter/material.dart';
@@ -9,23 +11,35 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [PullUpChartBlocProvider.provider],
+      providers: [
+        PullUpChartBlocProvider.provider,
+        MuscleUpChartBlocProvider.provider,
+      ],
       child: Column(
-        spacing: 32.0,
+        spacing: 8.0,
         mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Center(
-            child: Text(
-              'Guten ${_getGreetingForTimeOfDay()}, Sanny',
-              style: TextStyle(),
+          Text(
+            'Guten ${_getGreetingForTimeOfDay()}, Sanny 🧚🏼‍♀️',
+            style: TextStyle(fontSize: 32, fontWeight: FontWeight.w500),
+          ),
+          Text(
+            '☀️ Looks like a great moment for a training ☀️',
+            style: TextStyle(fontSize: 24, fontStyle: FontStyle.italic),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                spacing: 10.0,
+                children: [PullUpsChart(), MuscleUpsChart()],
+              ),
             ),
           ),
-          ...[
-            PullUpsChart(),
-            PullUpsChart(),
-          ].map((chart) => Expanded(child: chart)).toList(),
         ],
       ),
     );

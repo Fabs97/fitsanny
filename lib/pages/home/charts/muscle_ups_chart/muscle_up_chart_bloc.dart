@@ -4,22 +4,22 @@ import 'package:fitsanny/model/log.dart';
 import 'package:fitsanny/repositories/log_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-part 'pull_up_chart_event.dart';
-part 'pull_up_chart_state.dart';
+part 'muscle_up_chart_event.dart';
+part 'muscle_up_chart_state.dart';
 
-class PullUpChartBloc extends Bloc<PullUpChartEvent, PullUpChartState> {
+class MuscleUpChartBloc extends Bloc<MuscleUpChartEvent, MuscleUpChartState> {
   final LogRepository _logRepository;
 
-  PullUpChartBloc({required LogRepository repository})
+  MuscleUpChartBloc({required LogRepository repository})
     : _logRepository = repository,
       super(LogInitial()) {
-    on<LoadLogsForPullUpChart>((event, emit) async {
+    on<LoadLogsForMuscleUpChart>((event, emit) async {
       try {
         emit(LogsLoading());
         final logs = await _logRepository.getLogsBetween(
           event.startTime,
           event.endTime,
-          exerciseName: 'pull up',
+          exerciseName: 'Muscle Up',
           limit: 5,
         );
         emit(LogsLoaded(logs));
@@ -32,15 +32,15 @@ class PullUpChartBloc extends Bloc<PullUpChartEvent, PullUpChartState> {
   }
 }
 
-extension PullUpChartBlocProvider on PullUpChartBloc {
-  static BlocProvider<PullUpChartBloc> get provider =>
-      BlocProvider<PullUpChartBloc>(
+extension MuscleUpChartBlocProvider on MuscleUpChartBloc {
+  static BlocProvider<MuscleUpChartBloc> get provider =>
+      BlocProvider<MuscleUpChartBloc>(
         create: (context) {
           final databaseCubit = context.read<DatabaseBloc>();
           if (databaseCubit.database == null) {
             throw StateError('Database not initialized');
           }
-          return PullUpChartBloc(
+          return MuscleUpChartBloc(
             repository: LogRepository(databaseCubit.database!),
           );
         },

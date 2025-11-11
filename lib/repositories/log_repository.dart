@@ -41,30 +41,8 @@ class LogRepository {
     DateTime start,
     DateTime end, {
     String? exerciseName,
+    int? limit = 10,
   }) async {
-    // final rows = await _database.rawQuery(
-    //       '''
-    //     SELECT
-    //       l.id AS log_id,
-    //       l.training_id,
-    //       l.created_at,
-    //       s.id AS set_id,
-    //       s.exercise_id AS set_exercise_id,
-    //       s.reps AS set_reps,
-    //       s.kgs AS set_kgs
-    //     FROM
-    //       ${getDatabaseTable(DatabaseTablesEnum.log)} l
-    //     JOIN
-    //       ${getDatabaseTable(DatabaseTablesEnum.set)} s ON s.log_id = l.id
-    //     WHERE
-    //       l.created_at BETWEEN ? AND ?
-    // ''',
-    //       [
-    //         start.toIso8601String().substring(0, 19).replaceFirst('T', ' '),
-    //         end.toIso8601String().substring(0, 19).replaceFirst('T', ' '),
-    //       ],
-    //     );
-    // Convert DateTime → SQLite-compatible string format
     final startStr = start
         .toIso8601String()
         .substring(0, 19)
@@ -114,6 +92,8 @@ class LogRepository {
 
     final orderBy = 'ORDER BY l.created_at DESC';
 
+    final limitClause = 'LIMIT 10';
+
     final sql =
         '''
     $baseSelect
@@ -121,6 +101,7 @@ class LogRepository {
     $joinClause
     $whereClause
     $orderBy
+    $limitClause
   ''';
 
     final rows = await _database.rawQuery(sql, whereArgs);

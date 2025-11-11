@@ -1,31 +1,31 @@
 import 'package:fitsanny/model/log.dart';
-import 'package:fitsanny/pages/home/charts/pull_ups_chart/pull_up_chart_bloc.dart';
+import 'package:fitsanny/pages/home/charts/muscle_ups_chart/muscle_up_chart_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
-class PullUpsChart extends StatefulWidget {
-  const PullUpsChart({super.key});
+class MuscleUpsChart extends StatefulWidget {
+  const MuscleUpsChart({super.key});
 
   @override
-  State<PullUpsChart> createState() => _PullUpsChartState();
+  State<MuscleUpsChart> createState() => _MuscleUpsChartState();
 }
 
-class _PullUpsChartState extends State<PullUpsChart> {
-  final int goal = 10;
+class _MuscleUpsChartState extends State<MuscleUpsChart> {
+  final int goal = 1;
   Map<String, int> dataPoints = {};
 
   @override
   void initState() {
     super.initState();
-    context.read<PullUpChartBloc>().add(
-      LoadLogsForPullUpChart(onComplete: _onDataCollectionComplete),
+    context.read<MuscleUpChartBloc>().add(
+      LoadLogsForMuscleUpChart(onComplete: _onDataCollectionComplete),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<PullUpChartBloc, PullUpChartState>(
+    return BlocBuilder<MuscleUpChartBloc, MuscleUpChartState>(
       builder: (context, state) {
         if (state is LogsLoaded) {
           return Container(
@@ -40,7 +40,7 @@ class _PullUpsChartState extends State<PullUpsChart> {
                 spacing: 4.0,
                 children: [
                   Text(
-                    'Your set goal for pull ups: $goal',
+                    'Your set goal for muscle ups: $goal',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                   ),
                   ...(dataPoints.isNotEmpty
@@ -50,7 +50,7 @@ class _PullUpsChartState extends State<PullUpsChart> {
                                 text: TextSpan(
                                   style: DefaultTextStyle.of(context).style,
                                   children: [
-                                    TextSpan(text: 'Pull ups done on '),
+                                    TextSpan(text: 'Muscle ups done on '),
                                     TextSpan(
                                       text: dataPoint.key.toString(),
                                       style: TextStyle(

@@ -30,6 +30,7 @@ List<String> baseExercises = [
   'Incline Bench Press',
   'Overhead Press',
   'Push Up',
+  'Muscle Up',
   'Pull Up',
   'Chin Up',
   'Barbell Row',

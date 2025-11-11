@@ -81,19 +81,11 @@ class _PullUpsChartState extends State<PullUpsChart> {
             ),
           );
         } else if (state is LogError) {
-          return Column(
-            children: [
-              Expanded(
-                child: Center(
-                  child: Text(
-                    'Home::build - Wrong LogState ${state.runtimeType}',
-                  ),
-                ),
-              ),
-            ],
+          return Center(
+            child: Text('Home::build - Wrong LogState ${state.runtimeType}'),
           );
         } else {
-          return Expanded(child: Center(child: CircularProgressIndicator()));
+          return Center(child: CircularProgressIndicator());
         }
       },
     );

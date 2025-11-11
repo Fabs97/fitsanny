@@ -17,7 +17,6 @@ class HomePage extends StatelessWidget {
       ],
       child: Column(
         spacing: 8.0,
-        mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -32,7 +31,7 @@ class HomePage extends StatelessWidget {
           Expanded(
             child: SingleChildScrollView(
               child: Column(
-                mainAxisSize: MainAxisSize.max,
+                mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 spacing: 10.0,

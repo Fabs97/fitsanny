@@ -1,4 +1,4 @@
-import 'package:fitsanny/bloc/training/training_bloc.dart';
+import 'package:fitsanny/bloc/training/training_cubit.dart';
 import 'package:fitsanny/components/exercise_dropdown.dart';
 import 'package:fitsanny/components/form_stepper.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +11,7 @@ class ExerciseRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<TrainingBloc, TrainingState>(
+    return BlocBuilder<TrainingCubit, TrainingState>(
       builder: (context, state) {
         if (state is! NewTraining) {
           return Center(

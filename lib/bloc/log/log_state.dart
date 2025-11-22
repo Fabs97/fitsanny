@@ -1,4 +1,4 @@
-part of 'log_bloc.dart';
+part of 'log_cubit.dart';
 
 class LogState extends Equatable {
   const LogState();

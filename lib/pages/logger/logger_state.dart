@@ -1,4 +1,4 @@
-part of 'logger_bloc.dart';
+part of 'logger_cubit.dart';
 
 class LoggerState extends Equatable {
   final Training? training;

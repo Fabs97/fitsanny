@@ -1,5 +1,5 @@
-import 'package:fitsanny/bloc/exercise_name/exercise_name_bloc.dart';
-import 'package:fitsanny/bloc/training/training_bloc.dart';
+import 'package:fitsanny/bloc/exercise_name/exercise_name_cubit.dart';
+import 'package:fitsanny/bloc/training/training_cubit.dart';
 import 'package:fitsanny/pages/training/exercise_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -26,12 +26,12 @@ class _ExerciseDropdownState extends State<ExerciseDropdown> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ExerciseNameBloc, ExerciseNamesState>(
+    return BlocBuilder<ExerciseNameCubit, ExerciseNamesState>(
       builder: (context, exerciseNameState) {
         if (exerciseNameState is ExerciseNamesError) {
           return Center(child: Text('Error: ${exerciseNameState.message}'));
         }
-        return BlocBuilder<TrainingBloc, TrainingState>(
+        return BlocBuilder<TrainingCubit, TrainingState>(
           builder: (context, trainingState) {
             if (trainingState is NewTraining) {
               final currentExercise =
@@ -76,12 +76,12 @@ class _ExerciseDropdownState extends State<ExerciseDropdown> {
                       onChanged: (int? value) {
                         if (value != null) {
                           // Dispatch an event to change the exercise selection in the NewTraining state
-                          context.read<TrainingBloc>().add(
-                            ChangeExerciseInNewTrainingEvent(
-                              index: widget.exerciseIndex,
-                              exerciseNameId: value,
-                            ),
-                          );
+                          context
+                              .read<TrainingCubit>()
+                              .changeExerciseInNewTraining(
+                                widget.exerciseIndex,
+                                value,
+                              );
                         }
                       },
                     ),
@@ -104,12 +104,12 @@ class _ExerciseDropdownState extends State<ExerciseDropdown> {
                           title: const Text('Create new exercise'),
                           content: ExerciseForm(
                             onComplete: (id) {
-                              context.read<TrainingBloc>().add(
-                                ChangeExerciseInNewTrainingEvent(
-                                  index: widget.exerciseIndex,
-                                  exerciseNameId: id,
-                                ),
-                              );
+                              context
+                                  .read<TrainingCubit>()
+                                  .changeExerciseInNewTraining(
+                                    widget.exerciseIndex,
+                                    id,
+                                  );
                             },
                           ),
                         ),

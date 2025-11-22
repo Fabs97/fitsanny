@@ -1,6 +1,5 @@
 import 'package:fitsanny/l10n/app_localizations.dart';
-import 'package:fitsanny/pages/home/charts/chart_bloc.dart';
-import 'package:fitsanny/pages/home/charts/chart_event.dart';
+import 'package:fitsanny/pages/home/charts/chart_cubit.dart';
 import 'package:fitsanny/pages/home/charts/chart_provider.dart';
 import 'package:fitsanny/pages/home/charts/chart_state.dart';
 import 'package:fitsanny/pages/home/charts/goal_progress_chart.dart';
@@ -17,7 +16,7 @@ class HomePage extends StatelessWidget {
       child: Builder(
         builder: (context) {
           // Trigger load
-          context.read<ChartBloc>().add(LoadCharts());
+          context.read<ChartCubit>().loadCharts();
           return Column(
             spacing: 8.0,
             mainAxisAlignment: MainAxisAlignment.start,
@@ -34,7 +33,7 @@ class HomePage extends StatelessWidget {
                 style: TextStyle(fontSize: 24, fontStyle: FontStyle.italic),
               ),
               Expanded(
-                child: BlocBuilder<ChartBloc, ChartState>(
+                child: BlocBuilder<ChartCubit, ChartState>(
                   builder: (context, state) {
                     if (state is ChartsLoading) {
                       return Center(child: CircularProgressIndicator());

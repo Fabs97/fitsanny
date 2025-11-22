@@ -1,5 +1,5 @@
-import 'package:fitsanny/bloc/exercise_name/exercise_name_bloc.dart';
-import 'package:fitsanny/bloc/training/training_bloc.dart';
+import 'package:fitsanny/bloc/exercise_name/exercise_name_cubit.dart';
+import 'package:fitsanny/bloc/training/training_cubit.dart';
 import 'package:fitsanny/model/exercise.dart';
 import 'package:fitsanny/pages/training/exercise_row.dart';
 import 'package:flutter/material.dart';
@@ -22,14 +22,14 @@ class _TrainingFormState extends State<TrainingForm> {
   @override
   void initState() {
     super.initState();
-    context.read<ExerciseNameBloc>().add(LoadExerciseNamesEvent());
+    context.read<ExerciseNameCubit>().loadExerciseNames();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(AppLocalizations.of(context)!.addTraining)),
-      body: BlocConsumer<TrainingBloc, TrainingState>(
+      body: BlocConsumer<TrainingCubit, TrainingState>(
         listener: (context, state) {
           if (state is TrainingsLoaded) {
             context.go('/training');
@@ -57,10 +57,8 @@ class _TrainingFormState extends State<TrainingForm> {
                       labelText: AppLocalizations.of(context)!.titleLabel,
                     ),
                     onChanged: (value) {
-                      context.read<TrainingBloc>().add(
-                        NewTrainingEvent(
-                          training: state.newTraining.copyWith(title: value),
-                        ),
+                      context.read<TrainingCubit>().startNewTraining(
+                        state.newTraining.copyWith(title: value),
                       );
                     },
                     validator: FormBuilderValidators.required(),
@@ -73,12 +71,8 @@ class _TrainingFormState extends State<TrainingForm> {
                       labelText: AppLocalizations.of(context)!.descriptionLabel,
                     ),
                     onChanged: (value) {
-                      context.read<TrainingBloc>().add(
-                        NewTrainingEvent(
-                          training: state.newTraining.copyWith(
-                            description: value,
-                          ),
-                        ),
+                      context.read<TrainingCubit>().startNewTraining(
+                        state.newTraining.copyWith(description: value),
                       );
                     },
                   ),
@@ -96,11 +90,9 @@ class _TrainingFormState extends State<TrainingForm> {
                                 final updatedExercises = List<Exercise>.from(
                                   state.newTraining.exercises,
                                 )..removeAt(index);
-                                context.read<TrainingBloc>().add(
-                                  NewTrainingEvent(
-                                    training: state.newTraining.copyWith(
-                                      exercises: updatedExercises,
-                                    ),
+                                context.read<TrainingCubit>().startNewTraining(
+                                  state.newTraining.copyWith(
+                                    exercises: updatedExercises,
                                   ),
                                 );
                               },
@@ -113,8 +105,8 @@ class _TrainingFormState extends State<TrainingForm> {
                   SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
-                      context.read<TrainingBloc>().add(
-                        AddExerciseToNewTrainingEvent(),
+                      context.read<TrainingCubit>().addExerciseToNewTraining(
+                        Exercise(exerciseNameId: 0, reps: 0, kgs: 0.0),
                       );
                     },
                     child: Text(AppLocalizations.of(context)!.addExercise),
@@ -123,10 +115,15 @@ class _TrainingFormState extends State<TrainingForm> {
                   ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState?.saveAndValidate() ?? false) {
-                        final event = state.newTraining.id != null
-                            ? UpdateTrainingEvent(state.newTraining)
-                            : AddTrainingEvent(state.newTraining);
-                        context.read<TrainingBloc>().add(event);
+                        if (state.newTraining.id != null) {
+                          context.read<TrainingCubit>().updateTraining(
+                            state.newTraining,
+                          );
+                        } else {
+                          context.read<TrainingCubit>().addTraining(
+                            state.newTraining,
+                          );
+                        }
                       }
                     },
                     child: Text(AppLocalizations.of(context)!.save),

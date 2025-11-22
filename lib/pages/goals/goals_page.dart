@@ -1,6 +1,5 @@
-import 'package:fitsanny/bloc/exercise_name/exercise_name_bloc.dart';
-import 'package:fitsanny/bloc/goal/goal_bloc.dart';
-import 'package:fitsanny/bloc/goal/goal_event.dart';
+import 'package:fitsanny/bloc/exercise_name/exercise_name_cubit.dart';
+import 'package:fitsanny/bloc/goal/goal_cubit.dart';
 import 'package:fitsanny/bloc/goal/goal_state.dart';
 import 'package:fitsanny/components/form_stepper.dart';
 import 'package:fitsanny/model/goal.dart';
@@ -20,8 +19,8 @@ class _GoalsPageState extends State<GoalsPage> {
   @override
   void initState() {
     super.initState();
-    context.read<GoalBloc>().add(LoadGoals());
-    context.read<ExerciseNameBloc>().add(LoadExerciseNamesEvent());
+    context.read<GoalCubit>().loadGoals();
+    context.read<ExerciseNameCubit>().loadExerciseNames();
   }
 
   void _showGoalForm(BuildContext context, [Goal? goal]) {
@@ -41,7 +40,7 @@ class _GoalsPageState extends State<GoalsPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                BlocBuilder<ExerciseNameBloc, ExerciseNamesState>(
+                BlocBuilder<ExerciseNameCubit, ExerciseNamesState>(
                   builder: (context, state) {
                     if (state is ExerciseNamesLoaded) {
                       return FormBuilderDropdown<int>(
@@ -100,9 +99,9 @@ class _GoalsPageState extends State<GoalsPage> {
                   );
 
                   if (goal == null) {
-                    context.read<GoalBloc>().add(AddGoal(newGoal));
+                    context.read<GoalCubit>().addGoal(newGoal);
                   } else {
-                    context.read<GoalBloc>().add(UpdateGoal(newGoal));
+                    context.read<GoalCubit>().updateGoal(newGoal);
                   }
                   Navigator.pop(context);
                 }
@@ -119,7 +118,7 @@ class _GoalsPageState extends State<GoalsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('My Goals')),
-      body: BlocBuilder<GoalBloc, GoalState>(
+      body: BlocBuilder<GoalCubit, GoalState>(
         builder: (context, state) {
           if (state is GoalsLoading) {
             return Center(child: CircularProgressIndicator());
@@ -132,7 +131,7 @@ class _GoalsPageState extends State<GoalsPage> {
               itemBuilder: (context, index) {
                 final goal = state.goals[index];
                 final exerciseNameState = context
-                    .read<ExerciseNameBloc>()
+                    .read<ExerciseNameCubit>()
                     .state;
                 String exerciseName = 'Unknown Exercise';
 
@@ -163,7 +162,7 @@ class _GoalsPageState extends State<GoalsPage> {
                       IconButton(
                         icon: Icon(Icons.delete),
                         onPressed: () {
-                          context.read<GoalBloc>().add(DeleteGoal(goal.id!));
+                          context.read<GoalCubit>().deleteGoal(goal.id!);
                         },
                       ),
                     ],

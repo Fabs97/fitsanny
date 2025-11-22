@@ -1,5 +1,5 @@
-import 'package:fitsanny/bloc/log/log_bloc.dart';
-import 'package:fitsanny/pages/logger/logger_bloc.dart';
+import 'package:fitsanny/bloc/log/log_cubit.dart';
+import 'package:fitsanny/pages/logger/logger_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -20,9 +20,7 @@ class _LoggerHomeState extends State<LoggerHome> {
     // Load logs for the last 30 days by default
     final now = DateTime.now();
     final thirtyDaysAgo = now.subtract(Duration(days: 30));
-    context.read<LogBloc>().add(
-      LoadLogsTimeSpanEvent(start: thirtyDaysAgo, end: now),
-    );
+    context.read<LogCubit>().loadLogsTimeSpan(thirtyDaysAgo, now);
   }
 
   @override
@@ -31,7 +29,7 @@ class _LoggerHomeState extends State<LoggerHome> {
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.trainingHistoryTitle),
       ),
-      body: BlocBuilder<LogBloc, LogState>(
+      body: BlocBuilder<LogCubit, LogState>(
         builder: (context, state) {
           if (state is LogsLoading) {
             return Center(child: CircularProgressIndicator());
@@ -70,7 +68,7 @@ class _LoggerHomeState extends State<LoggerHome> {
           return Container();
         },
       ),
-      floatingActionButton: BlocBuilder<LoggerBloc, LoggerState>(
+      floatingActionButton: BlocBuilder<LoggerCubit, LoggerState>(
         builder: (context, loggerState) {
           return FloatingActionButton(
             onPressed: () {

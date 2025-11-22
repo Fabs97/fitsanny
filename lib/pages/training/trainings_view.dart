@@ -1,4 +1,5 @@
-import 'package:fitsanny/bloc/training/training_bloc.dart';
+import 'package:fitsanny/bloc/training/training_cubit.dart';
+import 'package:fitsanny/model/training.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -13,7 +14,7 @@ class TrainingsView extends StatelessWidget {
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.addTraining),
       ), // Adjust title if needed
-      body: BlocBuilder<TrainingBloc, TrainingState>(
+      body: BlocBuilder<TrainingCubit, TrainingState>(
         builder: (context, state) {
           return state is TrainingsLoaded && state.trainings.isEmpty
               ? Column(
@@ -44,9 +45,9 @@ class TrainingsView extends StatelessWidget {
                                   if (direction ==
                                       DismissDirection.endToStart) {
                                     // deleted
-                                    context.read<TrainingBloc>().add(
-                                      RemoveTrainingEvent(training.id!),
-                                    );
+                                    context
+                                        .read<TrainingCubit>()
+                                        .removeTraining(training.id!);
                                   }
                                 },
                                 background: Container(
@@ -108,7 +109,9 @@ class TrainingsView extends StatelessWidget {
   _buildNewTrainingButton(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        context.read<TrainingBloc>().add(NewTrainingEvent());
+        context.read<TrainingCubit>().startNewTraining(
+          Training(title: '', description: '', exercises: []),
+        );
         context.go('/training/new');
       },
       child: Text('Add Training'),

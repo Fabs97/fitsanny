@@ -1,4 +1,4 @@
-part of 'exercise_name_bloc.dart';
+part of 'exercise_name_cubit.dart';
 
 class ExerciseNamesState extends Equatable {
   const ExerciseNamesState();

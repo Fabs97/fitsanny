@@ -1,15 +1,26 @@
 import 'package:fitsanny/app.dart';
-import 'package:fitsanny/bloc/database/database_bloc.dart';
-import 'package:fitsanny/bloc/exercise_name/exercise_name_bloc.dart';
+import 'package:fitsanny/bloc/database/database_cubit.dart';
+import 'package:fitsanny/bloc/exercise_name/exercise_name_cubit.dart';
 import 'package:fitsanny/bloc/goal/goal_provider.dart';
-import 'package:fitsanny/bloc/log/log_bloc.dart';
-import 'package:fitsanny/bloc/training/training_bloc.dart';
-import 'package:fitsanny/pages/logger/logger_bloc.dart';
+import 'package:fitsanny/bloc/log/log_cubit.dart';
+import 'package:fitsanny/bloc/training/training_cubit.dart';
+import 'package:fitsanny/pages/logger/logger_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'dart:io';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Request storage permission at startup on Android
+  if (Platform.isAndroid) {
+    final status = await Permission.storage.status;
+    if (!status.isGranted) {
+      await Permission.storage.request();
+    }
+  }
+
   runApp(const MyApp());
 }
 
@@ -19,8 +30,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => DatabaseBloc()..add(InitializeDatabaseEvent()),
-      child: BlocBuilder<DatabaseBloc, DatabaseState>(
+      create: (context) => DatabaseCubit()..initializeDatabase(),
+      child: BlocBuilder<DatabaseCubit, DatabaseState>(
         builder: (context, state) {
           if (state is LoadedDatabaseState) {
             return MultiBlocProvider(

@@ -1,4 +1,4 @@
-part of 'training_bloc.dart';
+part of 'training_cubit.dart';
 
 class TrainingState extends Equatable {
   const TrainingState();

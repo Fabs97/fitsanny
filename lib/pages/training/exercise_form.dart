@@ -1,4 +1,4 @@
-import 'package:fitsanny/bloc/exercise_name/exercise_name_bloc.dart';
+import 'package:fitsanny/bloc/exercise_name/exercise_name_cubit.dart';
 import 'package:fitsanny/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,7 +12,7 @@ class ExerciseForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ExerciseNameBloc, ExerciseNamesState>(
+    return BlocBuilder<ExerciseNameCubit, ExerciseNamesState>(
       builder: (context, state) {
         if (state is! ExerciseNamesLoaded) {
           return Center(child: Text(AppLocalizations.of(context)!.loading));
@@ -35,14 +35,12 @@ class ExerciseForm extends StatelessWidget {
                       _formKey.currentState?.fields['exercise_name']?.value ??
                       '';
                   if (name.isNotEmpty) {
-                    context.read<ExerciseNameBloc>().add(
-                      AddExerciseNameEvent(
-                        name,
-                        onComplete: (id) {
-                          // propagate to optional callback passed by caller
-                          onComplete?.call(id);
-                        },
-                      ),
+                    context.read<ExerciseNameCubit>().addExerciseName(
+                      name,
+                      onComplete: (id) {
+                        // propagate to optional callback passed by caller
+                        onComplete?.call(id);
+                      },
                     );
                     Navigator.pop(
                       context,

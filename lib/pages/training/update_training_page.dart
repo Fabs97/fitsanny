@@ -1,4 +1,4 @@
-import 'package:fitsanny/bloc/training/training_bloc.dart';
+import 'package:fitsanny/bloc/training/training_cubit.dart';
 import 'package:fitsanny/model/training.dart';
 import 'package:fitsanny/pages/training/training_form.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +14,7 @@ class UpdateTrainingPage extends StatelessWidget {
     // Initialize the bloc with the training to be edited
     // We use a microtask to avoid updating state during build
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<TrainingBloc>().add(NewTrainingEvent(training: training));
+      context.read<TrainingCubit>().startNewTraining(training);
     });
 
     return TrainingForm();

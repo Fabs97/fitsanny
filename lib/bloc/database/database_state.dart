@@ -1,4 +1,4 @@
-part of 'database_bloc.dart';
+part of 'database_cubit.dart';
 
 sealed class DatabaseState extends Equatable {
   final Database? database;

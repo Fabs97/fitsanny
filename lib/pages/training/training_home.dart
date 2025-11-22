@@ -1,4 +1,4 @@
-import 'package:fitsanny/bloc/training/training_bloc.dart';
+import 'package:fitsanny/bloc/training/training_cubit.dart';
 import 'package:fitsanny/pages/training/trainings_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,8 +13,8 @@ class TrainingHome extends StatefulWidget {
 class _TrainingHomeState extends State<TrainingHome> {
   @override
   Widget build(BuildContext context) {
-    context.read<TrainingBloc>().add(LoadTrainingsEvent());
-    return BlocBuilder<TrainingBloc, TrainingState>(
+    context.read<TrainingCubit>().loadTrainings();
+    return BlocBuilder<TrainingCubit, TrainingState>(
       builder: (BuildContext context, TrainingState state) {
         if (state is TrainingsInitial || state is TrainingsLoading) {
           return const Center(child: CircularProgressIndicator());

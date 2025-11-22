@@ -1,6 +1,6 @@
-import 'package:fitsanny/bloc/log/log_bloc.dart';
-import 'package:fitsanny/bloc/training/training_bloc.dart';
-import 'package:fitsanny/pages/logger/logger_bloc.dart';
+import 'package:fitsanny/bloc/log/log_cubit.dart';
+import 'package:fitsanny/bloc/training/training_cubit.dart';
+import 'package:fitsanny/pages/logger/logger_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -11,8 +11,8 @@ Widget loggerShellRouterBuilder(
   GoRouterState router,
   Widget child,
 ) {
-  context.read<TrainingBloc>().add(LoadTrainingsEvent());
-  return BlocBuilder<TrainingBloc, TrainingState>(
+  context.read<TrainingCubit>().loadTrainings();
+  return BlocBuilder<TrainingCubit, TrainingState>(
     builder: (context, trainingState) {
       if (trainingState is TrainingsLoading) {
         return Center(child: CircularProgressIndicator());
@@ -25,10 +25,10 @@ Widget loggerShellRouterBuilder(
           ),
         );
       }
-      return BlocBuilder<LogBloc, LogState>(
+      return BlocBuilder<LogCubit, LogState>(
         buildWhen: (previous, current) => current is LogsLoaded,
         builder: (context, state) {
-          return BlocBuilder<LoggerBloc, LoggerState>(
+          return BlocBuilder<LoggerCubit, LoggerState>(
             builder: (context, state) {
               return Column(
                 mainAxisSize: MainAxisSize.max,
@@ -47,6 +47,7 @@ Widget loggerShellRouterBuilder(
                             padding: WidgetStatePropertyAll(
                               const EdgeInsets.symmetric(horizontal: 8.0),
                             ),
+                            elevation: WidgetStatePropertyAll(0.0),
                             onTap: () => controller.openView(),
                             onChanged: (query) => controller.openView(),
                             trailing: [const Icon(Icons.search)],
@@ -64,19 +65,17 @@ Widget loggerShellRouterBuilder(
                                     onTap: () {
                                       // Load logs for the chosen training, and
                                       // navigate to the logger details when done.
-                                      context.read<LogBloc>().add(
-                                        LoadLogsEvent(
-                                          e.id!,
-                                          onComplete: (success, {data}) =>
-                                              // Use absolute path to be explicit.
-                                              context.go('/log/new'),
-                                        ),
+                                      context.read<LogCubit>().loadLogs(
+                                        e.id!,
+                                        onComplete: (success, {data}) =>
+                                            // Use absolute path to be explicit.
+                                            context.go('/log/new'),
                                       );
 
                                       // Update logger state (no navigation here).
-                                      context.read<LoggerBloc>().add(
-                                        ChooseTraining(e),
-                                      );
+                                      context
+                                          .read<LoggerCubit>()
+                                          .chooseTraining(e);
 
                                       controller.closeView(e.title);
                                     },

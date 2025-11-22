@@ -1,9 +1,9 @@
 import 'package:collection/collection.dart';
-import 'package:fitsanny/bloc/log/log_bloc.dart';
+import 'package:fitsanny/bloc/log/log_cubit.dart';
 import 'package:fitsanny/l10n/app_localizations.dart';
 import 'package:fitsanny/model/log.dart';
 import 'package:fitsanny/model/set.dart';
-import 'package:fitsanny/pages/logger/logger_bloc.dart';
+import 'package:fitsanny/pages/logger/logger_cubit.dart';
 import 'package:fitsanny/pages/logger/logger_set_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,23 +24,14 @@ class _LoggerDetailsState extends State<LoggerDetails> {
   @override
   void initState() {
     super.initState();
-    LogState currentLogState = BlocProvider.of<LogBloc>(context).state;
-    LoggerState currentLoggerState = BlocProvider.of<LoggerBloc>(context).state;
+    LogState currentLogState = BlocProvider.of<LogCubit>(context).state;
+    LoggerState currentLoggerState = BlocProvider.of<LoggerCubit>(
+      context,
+    ).state;
 
     if (widget.logToEdit != null) {
       log = widget.logToEdit;
-      // We need to load the training for this log to display exercises correctly
-      // But LoggerDetails assumes LoggerBloc has the training.
-      // If we are coming from Home, LoggerBloc might not have the training set.
-      // We should probably set the training in LoggerBloc or fetch it.
-      // For now, let's assume we need to fetch the training or use what's in the log if we had training info.
-      // But Log object only has trainingId.
-      // We need to ensure LoggerBloc has the correct training loaded.
-      // This is tricky because LoggerDetails relies on LoggerBloc state being ChosenTraining.
-      // If we edit, we need to simulate that state.
-      context.read<LoggerBloc>().add(
-        LoadTraining(widget.logToEdit!.trainingId),
-      );
+      context.read<LoggerCubit>().loadTraining(widget.logToEdit!.trainingId);
     } else if (currentLogState is LogsLoaded) {
       final logs = currentLogState.logs;
 
@@ -70,7 +61,7 @@ class _LoggerDetailsState extends State<LoggerDetails> {
 
     return Padding(
       padding: const EdgeInsets.only(top: 8.0),
-      child: BlocBuilder<LoggerBloc, LoggerState>(
+      child: BlocBuilder<LoggerCubit, LoggerState>(
         builder: (context, loggerState) {
           return FormBuilder(
             key: _formKey,
@@ -102,6 +93,8 @@ class _LoggerDetailsState extends State<LoggerDetails> {
                               padding: const EdgeInsets.all(8.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
                                     exercise.exerciseName ?? 'Unknown',
@@ -230,26 +223,22 @@ class _LoggerDetailsState extends State<LoggerDetails> {
                           );
 
                           if (widget.logToEdit != null) {
-                            context.read<LogBloc>().add(
-                              UpdateLogEvent(
-                                updatedLog,
-                                onComplete: (success, {data}) {
-                                  if (success) {
-                                    Navigator.pop(context);
-                                  }
-                                },
-                              ),
+                            context.read<LogCubit>().updateLog(
+                              updatedLog,
+                              onComplete: (success, {data}) {
+                                if (success) {
+                                  Navigator.pop(context);
+                                }
+                              },
                             );
                           } else {
-                            context.read<LogBloc>().add(
-                              AddLogsEvent(
-                                [updatedLog],
-                                onComplete: (success, {data}) {
-                                  if (success) {
-                                    Navigator.pop(context);
-                                  }
-                                },
-                              ),
+                            context.read<LogCubit>().addLogs(
+                              [updatedLog],
+                              onComplete: (success, {data}) {
+                                if (success) {
+                                  Navigator.pop(context);
+                                }
+                              },
                             );
                           }
                         }

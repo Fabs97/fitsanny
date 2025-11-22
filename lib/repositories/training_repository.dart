@@ -68,6 +68,7 @@ class TrainingRepository {
         Training(
           id: trainingMap['id'],
           title: trainingMap['title'],
+          description: trainingMap['description'],
           exercises: exercises,
         ),
       );
@@ -84,5 +85,57 @@ class TrainingRepository {
     );
 
     return rowsAffected == 1;
+  }
+
+  Future<void> updateTraining(Training training) async {
+    await _database.transaction((txn) async {
+      // 1. Update Training Title
+      await txn.update(
+        getDatabaseTable(DatabaseTablesEnum.training),
+        training.toMap(),
+        where: 'id = ?',
+        whereArgs: [training.id],
+      );
+
+      // 2. Handle Exercises
+      // First, ensure all exercises have IDs (insert new ones)
+      final updatedExercises = await Future.wait(
+        training.exercises.map((e) async {
+          if (e.id != null) {
+            // Update existing exercise details (reps, kgs, name)
+            await txn.update(
+              getDatabaseTable(DatabaseTablesEnum.exercise),
+              e.toMap(),
+              where: 'id = ?',
+              whereArgs: [e.id],
+            );
+            return e;
+          } else {
+            // Insert new exercise
+            final id = await txn.insert(
+              getDatabaseTable(DatabaseTablesEnum.exercise),
+              e.toMap(),
+            );
+            return e.copyWith(id: id);
+          }
+        }),
+      );
+
+      // 3. Update Training-Exercise Associations
+      // Simplest approach: Delete all existing associations for this training and re-insert
+      await txn.delete(
+        getDatabaseTable(DatabaseTablesEnum.trainingExercise),
+        where: 'training_id = ?',
+        whereArgs: [training.id],
+      );
+
+      for (var exercise in updatedExercises) {
+        await txn.insert(
+          getDatabaseTable(DatabaseTablesEnum.trainingExercise),
+          {'training_id': training.id, 'exercise_id': exercise.id},
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
+    });
   }
 }

@@ -56,3 +56,14 @@ CREATE TABLE ${getDatabaseTable(DatabaseTablesEnum.set)}(
   FOREIGN KEY(log_id) REFERENCES ${getDatabaseTable(DatabaseTablesEnum.log)}(id)
 )
     ''';
+
+final String createGoalTableQuery =
+    '''
+CREATE TABLE ${getDatabaseTable(DatabaseTablesEnum.goal)}(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  exercise_id INTEGER,
+  reps INTEGER,
+  kgs REAL,
+  FOREIGN KEY(exercise_id) REFERENCES ${getDatabaseTable(DatabaseTablesEnum.exercise)}(id)
+)
+''';

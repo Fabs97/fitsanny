@@ -5,6 +5,7 @@ enum DatabaseTablesEnum {
   trainingExercise,
   log,
   set,
+  goal,
 }
 
 String getDatabaseTable(DatabaseTablesEnum table) {
@@ -21,6 +22,8 @@ String getDatabaseTable(DatabaseTablesEnum table) {
       return 'log';
     case DatabaseTablesEnum.set:
       return 'sets';
+    case DatabaseTablesEnum.goal:
+      return 'goal';
   }
 }
 

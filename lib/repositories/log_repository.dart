@@ -146,4 +146,32 @@ class LogRepository {
     });
     return newLogs;
   }
+
+  Future<Set?> getLatestSetForExercise(int exerciseId) async {
+    final rows = await _database.rawQuery(
+      '''
+    SELECT
+      s.id,
+      s.exercise_id,
+      s.log_id,
+      s.reps,
+      s.kgs
+    FROM
+      ${getDatabaseTable(DatabaseTablesEnum.set)} s
+    JOIN
+      ${getDatabaseTable(DatabaseTablesEnum.log)} l ON s.log_id = l.id
+    WHERE
+      s.exercise_id = ?
+    ORDER BY
+      l.created_at DESC
+    LIMIT 1
+    ''',
+      [exerciseId],
+    );
+
+    if (rows.isNotEmpty) {
+      return Set.fromMap(rows.first);
+    }
+    return null;
+  }
 }

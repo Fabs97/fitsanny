@@ -12,7 +12,11 @@ abstract class TrainingEvent extends Equatable {
 class LoadTrainingsEvent extends TrainingEvent {}
 
 class NewTrainingEvent extends TrainingEvent {
-  const NewTrainingEvent();
+  final Training? training;
+  const NewTrainingEvent({this.training});
+
+  @override
+  List<Object> get props => [if (training != null) training!];
 }
 
 //Event Designed for CREATING New Elements
@@ -34,9 +38,9 @@ class RemoveTrainingEvent extends TrainingEvent {
 }
 
 //Event Designed for UPDATING The Elements
-class EditTrainingEvent extends TrainingEvent {
+class UpdateTrainingEvent extends TrainingEvent {
   final Training training;
-  const EditTrainingEvent(this.training);
+  const UpdateTrainingEvent(this.training, {super.onComplete});
 
   @override
   List<Object> get props => [training];

@@ -33,6 +33,10 @@ class AppBottomBar extends StatelessWidget {
                     icon: Icon(Icons.edit_note),
                     onPressed: () => context.go('/log'),
                   ),
+                  IconButton(
+                    icon: Icon(Icons.military_tech),
+                    onPressed: () => context.go('/goals'),
+                  ),
                 ],
               ),
             ),

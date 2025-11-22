@@ -68,6 +68,15 @@ class TrainingsView extends StatelessWidget {
                                   subtitle: Text(
                                     'Exercises: ${training.exercises.length}',
                                   ),
+                                  trailing: IconButton(
+                                    icon: Icon(Icons.edit),
+                                    onPressed: () {
+                                      context.go(
+                                        '/training/update',
+                                        extra: training,
+                                      );
+                                    },
+                                  ),
                                 ),
                               ),
                             ),

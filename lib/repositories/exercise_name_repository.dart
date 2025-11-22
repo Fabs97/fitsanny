@@ -21,4 +21,17 @@ class ExerciseNameRepository {
       'name': name,
     }, conflictAlgorithm: ConflictAlgorithm.fail);
   }
+
+  Future<ExerciseName?> getExerciseName(int id) async {
+    final List<Map<String, dynamic>> maps = await _database.query(
+      'exercise_name',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+
+    if (maps.isNotEmpty) {
+      return ExerciseName.fromMap(maps.first);
+    }
+    return null;
+  }
 }

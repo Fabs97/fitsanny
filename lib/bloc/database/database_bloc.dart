@@ -11,7 +11,7 @@ part 'database_event.dart';
 part 'database_state.dart';
 
 class DatabaseBloc extends Bloc<DatabaseEvent, DatabaseState> {
-  static const int _version = 1;
+  static const int _version = 3;
   static const String _dbName = 'fitsanny.db';
 
   DatabaseBloc() : super(InitialDatabaseState()) {
@@ -47,7 +47,18 @@ class DatabaseBloc extends Bloc<DatabaseEvent, DatabaseState> {
             createTrainingExercisesTableQuery,
             createLoggerTableQuery,
             createSetTableQuery,
+            createGoalTableQuery,
           ].map((e) async => await db.execute(e)).toList();
+        },
+        onUpgrade: (db, oldVersion, newVersion) async {
+          if (oldVersion < 2) {
+            await db.execute(
+              'ALTER TABLE training ADD COLUMN description TEXT',
+            );
+          }
+          if (oldVersion < 3) {
+            await db.execute(createGoalTableQuery);
+          }
         },
       );
 
@@ -70,6 +81,9 @@ class DatabaseBloc extends Bloc<DatabaseEvent, DatabaseState> {
   }
 
   Database? database;
+
+  Future<String> get databasePath async =>
+      join(await getDatabasesPath(), _dbName);
 
   Future<void> _insertDefaultExercises() async {
     // Insert exercise names if they don’t already exist

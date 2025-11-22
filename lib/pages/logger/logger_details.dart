@@ -33,7 +33,7 @@ class _LoggerDetailsState extends State<LoggerDetails> {
         sets: logs.isEmpty
             // No logs available yet
             ? currentLoggerState.training!.exercises
-                  .map((e) => Set(exerciseId: e.id!, reps: 1, kgs: 5.0))
+                  .map((e) => Set(exerciseId: e.id!, reps: e.reps, kgs: e.kgs))
                   .toList()
             : logs.first.sets,
       );
@@ -57,7 +57,16 @@ class _LoggerDetailsState extends State<LoggerDetails> {
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Constrain the scrollable area so it can actually scroll
+                FormBuilderDateTimePicker(
+                  name: 'date',
+                  initialValue: log?.createdAt ?? DateTime.now(),
+                  inputType: InputType.date,
+                  decoration: const InputDecoration(
+                    labelText: 'Date',
+                    suffixIcon: Icon(Icons.calendar_today),
+                  ),
+                ),
+                // Constrain the scrollable area so it can actually scrollf
                 // instead of causing a column overflow. Using Expanded
                 // gives the SingleChildScrollView a bounded height.
                 Expanded(
@@ -78,7 +87,6 @@ class _LoggerDetailsState extends State<LoggerDetails> {
                         return SingleChildScrollView(
                           child: Column(
                             mainAxisSize: MainAxisSize.max,
-                            spacing: 8.0,
                             children: [
                               ...loggerState.training!.exercises.asMap().map((
                                 idx,
@@ -93,10 +101,15 @@ class _LoggerDetailsState extends State<LoggerDetails> {
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Column(
-                                        spacing: 16.0,
                                         mainAxisSize: MainAxisSize.max,
                                         children: [
-                                          Text(exercise.exerciseName!),
+                                          Text(
+                                            exercise.exerciseName!,
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
                                           // Guard against a missing entry for an
                                           // exercise id. If no sets are present
                                           // default to an empty list so the UI
@@ -229,8 +242,12 @@ class _LoggerDetailsState extends State<LoggerDetails> {
                         }).toList();
 
                         if (log != null) {
+                          final date =
+                              _formKey.currentState?.fields['date']?.value;
                           context.read<LogBloc>().add(
-                            AddLogsEvent([log!.copyWith(sets: sets)]),
+                            AddLogsEvent([
+                              log!.copyWith(sets: sets, createdAt: date),
+                            ]),
                           );
                         }
                       },

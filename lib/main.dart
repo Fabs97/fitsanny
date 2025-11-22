@@ -1,6 +1,7 @@
 import 'package:fitsanny/app.dart';
 import 'package:fitsanny/bloc/database/database_bloc.dart';
 import 'package:fitsanny/bloc/exercise_name/exercise_name_bloc.dart';
+import 'package:fitsanny/bloc/goal/goal_provider.dart';
 import 'package:fitsanny/bloc/log/log_bloc.dart';
 import 'package:fitsanny/bloc/training/training_bloc.dart';
 import 'package:fitsanny/pages/logger/logger_bloc.dart';
@@ -29,6 +30,7 @@ class MyApp extends StatelessWidget {
                 LogProvider.provider,
                 // This is a page bloc, shouldn't be here but it's 00.30 and I'm tired
                 LoggerProvider.provider,
+                GoalProvider.provider,
               ],
               child: App(),
             );
@@ -39,7 +41,7 @@ class MyApp extends StatelessWidget {
               ),
             );
           } else {
-            return const MaterialApp(
+            return MaterialApp(
               home: Scaffold(body: Center(child: CircularProgressIndicator())),
             );
           }

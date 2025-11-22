@@ -1,9 +1,12 @@
+import 'package:fitsanny/pages/goals/goals_page.dart';
 import 'package:fitsanny/pages/home/home.dart';
 import 'package:fitsanny/pages/logger/logger_details.dart';
 import 'package:fitsanny/pages/logger/logger_home.dart';
 import 'package:fitsanny/pages/logger/logger_shell_router.dart';
+import 'package:fitsanny/model/training.dart';
 import 'package:fitsanny/pages/training/training_form.dart';
 import 'package:fitsanny/pages/training/training_home.dart';
+import 'package:fitsanny/pages/training/update_training_page.dart';
 import 'package:fitsanny/shell_route_builder.dart';
 import 'package:go_router/go_router.dart';
 
@@ -28,6 +31,13 @@ final _router = GoRouter(
               path: '/new',
               builder: (context, state) => const TrainingForm(),
             ),
+            GoRoute(
+              path: '/update',
+              builder: (context, state) {
+                final training = state.extra as Training;
+                return UpdateTrainingPage(training: training);
+              },
+            ),
           ],
         ),
         ShellRoute(
@@ -45,6 +55,7 @@ final _router = GoRouter(
             ),
           ],
         ),
+        GoRoute(path: '/goals', builder: (context, state) => const GoalsPage()),
       ],
     ),
   ],

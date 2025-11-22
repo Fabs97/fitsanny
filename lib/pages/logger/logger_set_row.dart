@@ -19,7 +19,7 @@ class LoggerSetRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.max,
-      spacing: 16.0,
+      spacing: 8.0,
       children: [
         Text('Set #${idx + 1}'),
         Expanded(

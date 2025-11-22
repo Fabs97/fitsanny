@@ -40,10 +40,23 @@ class _TrainingFormState extends State<TrainingForm> {
                 name: 'title',
                 initialValue: state.newTraining.title,
                 onChanged: (value) => state.newTraining.copyWith(title: value),
-                decoration: const InputDecoration(suffixIcon: Icon(Icons.edit)),
+                decoration: const InputDecoration(
+                  labelText: 'Title',
+                  suffixIcon: Icon(Icons.edit),
+                ),
                 validator: FormBuilderValidators.compose([
                   FormBuilderValidators.required(),
                 ]),
+              ),
+              FormBuilderTextField(
+                name: 'description',
+                initialValue: state.newTraining.description,
+                onChanged: (value) =>
+                    state.newTraining.copyWith(description: value),
+                decoration: const InputDecoration(
+                  labelText: 'Description',
+                  suffixIcon: Icon(Icons.description),
+                ),
               ),
               Expanded(
                 child: SingleChildScrollView(
@@ -77,24 +90,69 @@ class _TrainingFormState extends State<TrainingForm> {
                   ElevatedButton(
                     onPressed: () {
                       print(state.newTraining);
-                      context.read<TrainingBloc>().add(
-                        AddTrainingEvent(
-                          state.newTraining.copyWith(
-                            title:
-                                _formKey.currentState?.fields['title']!.value ??
-                                state.newTraining.title,
-                          ),
-                          onComplete: (success) {
-                            if (success && context.mounted) {
-                              context.go('/training');
-                            }
-                            if (!success) {
-                              // TODO: add snackbar
-                              print("Error adding a training");
-                            }
-                          },
-                        ),
+                      // Extract updated exercises from form fields
+                      final updatedExercises = state.newTraining.exercises
+                          .asMap()
+                          .entries
+                          .map((e) {
+                            final idx = e.key;
+                            final exercise = e.value;
+                            final reps = _formKey
+                                .currentState
+                                ?.fields['reps_$idx']
+                                ?.value;
+                            final kgs = _formKey
+                                .currentState
+                                ?.fields['kgs_$idx']
+                                ?.value;
+
+                            return exercise.copyWith(
+                              reps: reps is String
+                                  ? int.tryParse(reps) ?? exercise.reps
+                                  : (reps as num?)?.toInt() ?? exercise.reps,
+                              kgs: kgs is String
+                                  ? double.tryParse(kgs) ?? exercise.kgs
+                                  : (kgs as num?)?.toDouble() ?? exercise.kgs,
+                            );
+                          })
+                          .toList();
+
+                      final updatedTraining = state.newTraining.copyWith(
+                        title:
+                            _formKey.currentState?.fields['title']!.value ??
+                            state.newTraining.title,
+                        description:
+                            _formKey.currentState?.fields['description']?.value,
+                        exercises: updatedExercises,
                       );
+
+                      final event = state.newTraining.id != null
+                          ? UpdateTrainingEvent(
+                              updatedTraining,
+                              onComplete: (success) {
+                                if (success && context.mounted) {
+                                  context.go('/training');
+                                }
+                                if (!success) {
+                                  // TODO: add snackbar
+                                  print("Error updating a training");
+                                }
+                              },
+                            )
+                          : AddTrainingEvent(
+                              updatedTraining,
+                              onComplete: (success) {
+                                if (success && context.mounted) {
+                                  context.go('/training');
+                                }
+                                if (!success) {
+                                  // TODO: add snackbar
+                                  print("Error adding a training");
+                                }
+                              },
+                            );
+
+                      context.read<TrainingBloc>().add(event);
                     },
                     child: Text('Save'),
                   ),

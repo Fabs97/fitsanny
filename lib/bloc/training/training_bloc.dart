@@ -3,6 +3,7 @@ import 'package:fitsanny/bloc/database/database_bloc.dart';
 import 'package:fitsanny/model/exercise.dart';
 import 'package:fitsanny/repositories/training_repository.dart';
 import 'package:fitsanny/model/training.dart';
+import 'package:fitsanny/services/file_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'training_event.dart';
@@ -10,10 +11,17 @@ part 'training_state.dart';
 
 class TrainingBloc extends Bloc<TrainingEvent, TrainingState> {
   final TrainingRepository _trainingRepository;
+  final FileService _fileService;
+  final DatabaseBloc _databaseBloc;
 
-  TrainingBloc({required TrainingRepository repository})
-    : _trainingRepository = repository,
-      super(TrainingsInitial()) {
+  TrainingBloc({
+    required TrainingRepository repository,
+    required FileService fileService,
+    required DatabaseBloc databaseBloc,
+  }) : _trainingRepository = repository,
+       _fileService = fileService,
+       _databaseBloc = databaseBloc,
+       super(TrainingsInitial()) {
     on<LoadTrainingsEvent>((event, emit) async {
       try {
         final trainings = await _trainingRepository.getTrainings();
@@ -23,7 +31,7 @@ class TrainingBloc extends Bloc<TrainingEvent, TrainingState> {
       }
     });
     on<NewTrainingEvent>((event, emit) {
-      emit(NewTraining());
+      emit(NewTraining(training: event.training));
     });
     on<AddTrainingEvent>((event, emit) async {
       if (state is NewTraining) {
@@ -32,6 +40,9 @@ class TrainingBloc extends Bloc<TrainingEvent, TrainingState> {
           final trainings = await _trainingRepository.getTrainings();
           emit(TrainingsLoaded(trainings));
           event.onComplete?.call(true);
+
+          // Trigger backup
+          _fileService.backupDatabase(await _databaseBloc.databasePath);
         } catch (e) {
           event.onComplete?.call(false);
           print(e); //TODO - Snackbar
@@ -43,7 +54,24 @@ class TrainingBloc extends Bloc<TrainingEvent, TrainingState> {
         await _trainingRepository.deleteTraining(event.id);
         final trainings = await _trainingRepository.getTrainings();
         emit(TrainingsLoaded(trainings));
+
+        // Trigger backup
+        _fileService.backupDatabase(await _databaseBloc.databasePath);
       } catch (e) {
+        print(e); //TODO - Snackbar
+      }
+    });
+    on<UpdateTrainingEvent>((event, emit) async {
+      try {
+        await _trainingRepository.updateTraining(event.training);
+        final trainings = await _trainingRepository.getTrainings();
+        emit(TrainingsLoaded(trainings));
+        event.onComplete?.call(true);
+
+        // Trigger backup
+        _fileService.backupDatabase(await _databaseBloc.databasePath);
+      } catch (e) {
+        event.onComplete?.call(false);
         print(e); //TODO - Snackbar
       }
     });
@@ -88,6 +116,8 @@ extension TrainingProvider on TrainingBloc {
       }
       return TrainingBloc(
         repository: TrainingRepository(databaseCubit.database!),
+        fileService: FileService(),
+        databaseBloc: databaseCubit,
       );
     },
   );

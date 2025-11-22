@@ -1,6 +1,8 @@
 import 'package:fitsanny/bloc/exercise_name/exercise_name_cubit.dart';
 import 'package:fitsanny/bloc/goal/goal_cubit.dart';
 import 'package:fitsanny/bloc/goal/goal_state.dart';
+import 'package:fitsanny/bloc/settings/settings_cubit.dart';
+import 'package:fitsanny/bloc/settings/settings_state.dart';
 import 'package:fitsanny/components/form_stepper.dart';
 import 'package:fitsanny/model/goal.dart';
 import 'package:flutter/material.dart';
@@ -117,69 +119,133 @@ class _GoalsPageState extends State<GoalsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('My Goals')),
-      body: BlocBuilder<GoalCubit, GoalState>(
-        builder: (context, state) {
-          if (state is GoalsLoading) {
-            return Center(child: CircularProgressIndicator());
-          } else if (state is GoalsLoaded) {
-            if (state.goals.isEmpty) {
-              return Center(child: Text('No goals set yet.'));
-            }
-            return ListView.builder(
-              itemCount: state.goals.length,
-              itemBuilder: (context, index) {
-                final goal = state.goals[index];
-                final exerciseNameState = context
-                    .read<ExerciseNameCubit>()
-                    .state;
-                String exerciseName = 'Unknown Exercise';
-
-                if (exerciseNameState is ExerciseNamesLoaded) {
-                  final exercise = exerciseNameState.exerciseNames.firstWhere(
-                    (e) => e.id == goal.exerciseId,
-                    orElse: () =>
-                        // Return a dummy object or handle gracefully
-                        // For now, just let the name be 'Unknown'
-                        // This relies on the fact that we can't easily create a dummy ExerciseName here
-                        // without importing the model.
-                        // Better approach:
-                        throw Exception('Exercise not found'),
-                  );
-                  exerciseName = exercise.name;
-                }
-
+      appBar: AppBar(title: Text('Profile')),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'Settings',
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+            ),
+            BlocBuilder<SettingsCubit, SettingsState>(
+              builder: (context, state) {
                 return ListTile(
-                  title: Text(exerciseName),
-                  subtitle: Text('${goal.reps} reps @ ${goal.kgs} kg'),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.edit),
-                        onPressed: () => _showGoalForm(context, goal),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.delete),
-                        onPressed: () {
-                          context.read<GoalCubit>().deleteGoal(goal.id!);
-                        },
-                      ),
+                  title: Text('Language'),
+                  subtitle: Text(_getLanguageName(state.locale.languageCode)),
+                  trailing: DropdownButton<String>(
+                    value: state.locale.languageCode,
+                    onChanged: (String? newValue) {
+                      if (newValue != null) {
+                        context.read<SettingsCubit>().changeLanguage(
+                          Locale(newValue),
+                        );
+                      }
+                    },
+                    items: [
+                      DropdownMenuItem(value: 'en', child: Text('English')),
+                      DropdownMenuItem(value: 'de', child: Text('Deutsch')),
+                      DropdownMenuItem(value: 'it', child: Text('Italiano')),
                     ],
                   ),
                 );
               },
-            );
-          } else if (state is GoalError) {
-            return Center(child: Text('Error: ${state.message}'));
-          }
-          return Container();
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showGoalForm(context),
-        child: Icon(Icons.add),
+            ),
+            Divider(),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'My Goals',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  IconButton(
+                    onPressed: () => _showGoalForm(context),
+                    icon: Icon(Icons.add),
+                  ),
+                ],
+              ),
+            ),
+            BlocBuilder<GoalCubit, GoalState>(
+              builder: (context, state) {
+                if (state is GoalsLoading) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (state is GoalsLoaded) {
+                  if (state.goals.isEmpty) {
+                    return Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text('No goals set yet.'),
+                    );
+                  }
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: state.goals.length,
+                    itemBuilder: (context, index) {
+                      final goal = state.goals[index];
+                      final exerciseNameState = context
+                          .read<ExerciseNameCubit>()
+                          .state;
+                      String exerciseName = 'Unknown Exercise';
+
+                      if (exerciseNameState is ExerciseNamesLoaded) {
+                        try {
+                          final exercise = exerciseNameState.exerciseNames
+                              .firstWhere((e) => e.id == goal.exerciseId);
+                          exerciseName = exercise.name;
+                        } catch (e) {
+                          // Handle case where exercise is not found
+                        }
+                      }
+
+                      return ListTile(
+                        title: Text(exerciseName),
+                        subtitle: Text('${goal.reps} reps @ ${goal.kgs} kg'),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.edit),
+                              onPressed: () => _showGoalForm(context, goal),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.delete),
+                              onPressed: () {
+                                context.read<GoalCubit>().deleteGoal(goal.id!);
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                } else if (state is GoalError) {
+                  return Center(child: Text('Error: ${state.message}'));
+                }
+                return Container();
+              },
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  String _getLanguageName(String code) {
+    switch (code) {
+      case 'en':
+        return 'English';
+      case 'de':
+        return 'Deutsch';
+      case 'it':
+        return 'Italiano';
+      default:
+        return 'Unknown';
+    }
   }
 }

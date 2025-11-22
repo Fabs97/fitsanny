@@ -38,7 +38,7 @@ class AppBottomBar extends StatelessWidget {
                     onPressed: () => context.go('/log'),
                   ),
                   IconButton(
-                    icon: Icon(Icons.workspace_premium),
+                    icon: Icon(Icons.person),
                     tooltip: AppLocalizations.of(context)!.goalsTooltip,
                     onPressed: () => context.go('/goals'),
                   ),

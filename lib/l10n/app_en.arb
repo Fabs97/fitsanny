@@ -1,0 +1,106 @@
+{
+  "@@locale": "en",
+  "homeGreeting": "Guten {timeOfDay}, Sanny 🧚🏼‍♀️",
+  "@homeGreeting": {
+    "placeholders": {
+      "timeOfDay": {
+        "type": "String"
+      }
+    }
+  },
+  "homeSubtitle": "☀️ Looks like a great moment for a training ☀️",
+  "noGoalsSet": "No goals set yet. Go to Profile > Goals to add some!",
+  "goalCurrent": "Current: {current}kg",
+  "@goalCurrent": {
+    "placeholders": {
+      "current": {
+        "type": "double",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "goalTarget": "Goal: {target}kg",
+  "@goalTarget": {
+    "placeholders": {
+      "target": {
+        "type": "double",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "reps": "{count} reps",
+  "@reps": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trainingHistoryTitle": "Training History",
+  "noLogsFound": "No logs found for the last 30 days.",
+  "setsCount": "{count} sets",
+  "@setsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dateLabel": "Date",
+  "removeSet": "Remove a set",
+  "addSet": "Add one more set!",
+  "save": "Save",
+  "cancel": "Cancel",
+  "myGoalsTitle": "My Goals",
+  "noGoalsSetYet": "No goals set yet.",
+  "goalSubtitle": "{reps} reps @ {kgs} kg",
+  "@goalSubtitle": {
+    "placeholders": {
+      "reps": {
+        "type": "int"
+      },
+      "kgs": {
+        "type": "double"
+      }
+    }
+  },
+  "addGoalTitle": "Add Goal",
+  "editGoalTitle": "Edit Goal",
+  "exerciseLabel": "Exercise",
+  "targetRepsLabel": "Target Reps",
+  "targetKgsLabel": "Target Kgs",
+  "loading": "Loading...",
+  "saveExercise": "Save Exercise",
+  "updateTrainingTitle": "Update Training",
+  "noTrainingsAvailable": "No trainings available, add one now!",
+  "loadingTrainings": "Loading trainings...",
+  "addTraining": "Add Training",
+  "exerciseNameLabel": "Exercise Name",
+  "titleLabel": "Title",
+  "descriptionLabel": "Description",
+  "addExercise": "Add Exercise",
+  "chooseTrainingHint": "Choose a training...",
+  "setLabel": "Set #{count}",
+  "@setLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "kgsLabel": "kgs",
+  "repsLabel": "reps",
+  "errorPrefix": "Error: {message}",
+  "@errorPrefix": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "homeTooltip": "Home",
+  "trainingTooltip": "Training",
+  "logTooltip": "Log",
+  "goalsTooltip": "Goals",
+  "pleaseChooseTraining": "Please choose a training first"
+}

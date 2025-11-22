@@ -4,6 +4,7 @@ import 'package:fitsanny/pages/logger/logger_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:fitsanny/l10n/app_localizations.dart';
 
 Widget loggerShellRouterBuilder(
   BuildContext context,
@@ -18,7 +19,9 @@ Widget loggerShellRouterBuilder(
       } else if (trainingState is! TrainingsLoaded) {
         return Center(
           child: Text(
-            'Logger::build - Wrong State ${trainingState.runtimeType}',
+            AppLocalizations.of(context)!.errorPrefix(
+              'Logger::build - Wrong State ${trainingState.runtimeType}',
+            ),
           ),
         );
       }
@@ -31,12 +34,16 @@ Widget loggerShellRouterBuilder(
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   SearchAnchor(
-                    viewHintText: 'Choose a training...',
+                    viewHintText: AppLocalizations.of(
+                      context,
+                    )!.chooseTrainingHint,
                     builder:
                         (BuildContext context, SearchController controller) {
                           return SearchBar(
                             controller: controller,
-                            hintText: 'Choose a training...',
+                            hintText: AppLocalizations.of(
+                              context,
+                            )!.chooseTrainingHint,
                             padding: WidgetStatePropertyAll(
                               const EdgeInsets.symmetric(horizontal: 8.0),
                             ),
@@ -68,7 +75,7 @@ Widget loggerShellRouterBuilder(
 
                                       // Update logger state (no navigation here).
                                       context.read<LoggerBloc>().add(
-                                        ChooseTraining(training: e),
+                                        ChooseTraining(e),
                                       );
 
                                       controller.closeView(e.title);

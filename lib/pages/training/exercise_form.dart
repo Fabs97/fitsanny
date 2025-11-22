@@ -1,25 +1,21 @@
 import 'package:fitsanny/bloc/exercise_name/exercise_name_bloc.dart';
+import 'package:fitsanny/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
-class ExerciseForm extends StatefulWidget {
-  const ExerciseForm({super.key, this.onComplete});
+class ExerciseForm extends StatelessWidget {
+  final Function(int)? onComplete;
+  final _formKey = GlobalKey<FormBuilderState>();
 
-  final void Function(int id)? onComplete;
+  ExerciseForm({super.key, this.onComplete});
 
-  @override
-  State<ExerciseForm> createState() => _ExerciseFormState();
-}
-
-class _ExerciseFormState extends State<ExerciseForm> {
-  final GlobalKey<FormBuilderState> _formKey = GlobalKey<FormBuilderState>();
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ExerciseNameBloc, ExerciseNamesState>(
       builder: (context, state) {
         if (state is! ExerciseNamesLoaded) {
-          return Center(child: Text('Loading...'));
+          return Center(child: Text(AppLocalizations.of(context)!.loading));
         }
         return FormBuilder(
           key: _formKey,
@@ -29,7 +25,9 @@ class _ExerciseFormState extends State<ExerciseForm> {
             children: [
               FormBuilderTextField(
                 name: 'exercise_name',
-                decoration: InputDecoration(labelText: 'Exercise Name'),
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.exerciseNameLabel,
+                ),
               ),
               TextButton(
                 onPressed: () {
@@ -42,7 +40,7 @@ class _ExerciseFormState extends State<ExerciseForm> {
                         name,
                         onComplete: (id) {
                           // propagate to optional callback passed by caller
-                          widget.onComplete?.call(id);
+                          onComplete?.call(id);
                         },
                       ),
                     );
@@ -51,7 +49,7 @@ class _ExerciseFormState extends State<ExerciseForm> {
                     ); // Bloc handles refresh automatically
                   }
                 },
-                child: Text('Save Exercise'),
+                child: Text(AppLocalizations.of(context)!.save),
               ),
             ],
           ),

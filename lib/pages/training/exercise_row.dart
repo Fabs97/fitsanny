@@ -1,7 +1,6 @@
 import 'package:fitsanny/bloc/training/training_bloc.dart';
 import 'package:fitsanny/components/exercise_dropdown.dart';
 import 'package:fitsanny/components/form_stepper.dart';
-// uuid_utils no longer needed here
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

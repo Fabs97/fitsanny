@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:fitsanny/bloc/log/log_bloc.dart';
+import 'package:fitsanny/l10n/app_localizations.dart';
 import 'package:fitsanny/model/log.dart';
 import 'package:fitsanny/model/set.dart';
 import 'package:fitsanny/pages/logger/logger_bloc.dart';
@@ -9,7 +10,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 class LoggerDetails extends StatefulWidget {
-  const LoggerDetails({super.key});
+  final Log? logToEdit;
+  const LoggerDetails({super.key, this.logToEdit});
 
   @override
   State<LoggerDetails> createState() => _LoggerDetailsState();
@@ -25,18 +27,37 @@ class _LoggerDetailsState extends State<LoggerDetails> {
     LogState currentLogState = BlocProvider.of<LogBloc>(context).state;
     LoggerState currentLoggerState = BlocProvider.of<LoggerBloc>(context).state;
 
-    if (currentLogState is LogsLoaded) {
+    if (widget.logToEdit != null) {
+      log = widget.logToEdit;
+      // We need to load the training for this log to display exercises correctly
+      // But LoggerDetails assumes LoggerBloc has the training.
+      // If we are coming from Home, LoggerBloc might not have the training set.
+      // We should probably set the training in LoggerBloc or fetch it.
+      // For now, let's assume we need to fetch the training or use what's in the log if we had training info.
+      // But Log object only has trainingId.
+      // We need to ensure LoggerBloc has the correct training loaded.
+      // This is tricky because LoggerDetails relies on LoggerBloc state being ChosenTraining.
+      // If we edit, we need to simulate that state.
+      context.read<LoggerBloc>().add(
+        LoadTraining(widget.logToEdit!.trainingId),
+      );
+    } else if (currentLogState is LogsLoaded) {
       final logs = currentLogState.logs;
 
-      log = Log(
-        trainingId: currentLoggerState.training!.id!,
-        sets: logs.isEmpty
-            // No logs available yet
-            ? currentLoggerState.training!.exercises
-                  .map((e) => Set(exerciseId: e.id!, reps: e.reps, kgs: e.kgs))
-                  .toList()
-            : logs.first.sets,
-      );
+      // Only create a log if training is selected
+      if (currentLoggerState.training != null) {
+        log = Log(
+          trainingId: currentLoggerState.training!.id!,
+          sets: logs.isEmpty
+              // No logs available yet
+              ? currentLoggerState.training!.exercises
+                    .map(
+                      (e) => Set(exerciseId: e.id!, reps: e.reps, kgs: e.kgs),
+                    )
+                    .toList()
+              : logs.first.sets,
+        );
+      }
     }
   }
 
@@ -61,140 +82,99 @@ class _LoggerDetailsState extends State<LoggerDetails> {
                   name: 'date',
                   initialValue: log?.createdAt ?? DateTime.now(),
                   inputType: InputType.date,
-                  decoration: const InputDecoration(
-                    labelText: 'Date',
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.dateLabel,
                     suffixIcon: Icon(Icons.calendar_today),
                   ),
                 ),
-                // Constrain the scrollable area so it can actually scrollf
-                // instead of causing a column overflow. Using Expanded
-                // gives the SingleChildScrollView a bounded height.
-                Expanded(
-                  child: BlocBuilder<LogBloc, LogState>(
-                    builder: (context, state) {
-                      if (state is LogsLoading) {
-                        return Center(child: CircularProgressIndicator());
-                      }
-                      if (state is! LogsLoaded) {
-                        if (state is LogError) print(state.message);
-                        return Center(
-                          child: Text(
-                            'LoggerDetails::build - Wrong event type : ${state.runtimeType}\n${state is LogError ? state.message : ''}',
-                          ),
-                        );
-                      }
-                      if (loggerState is ChosenTraining) {
-                        return SingleChildScrollView(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              ...loggerState.training!.exercises.asMap().map((
-                                idx,
-                                exercise,
-                              ) {
-                                return MapEntry(
-                                  idx,
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.grey),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.max,
-                                        children: [
-                                          Text(
-                                            exercise.exerciseName!,
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          // Guard against a missing entry for an
-                                          // exercise id. If no sets are present
-                                          // default to an empty list so the UI
-                                          // doesn't crash.
-                                          ...((setsGroupedByExerciseId[exercise
-                                                      .id]) ??
-                                                  [])
-                                              .asMap()
-                                              .map(
-                                                (idx, set) => MapEntry(
-                                                  idx,
-                                                  LoggerSetRow(
-                                                    idx: idx,
-                                                    exerciseId: exercise.id!,
-                                                    reps: set.reps,
-                                                    kgs: set.kgs,
-                                                  ),
-                                                ),
-                                              )
-                                              .values,
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceEvenly,
-                                            mainAxisSize: MainAxisSize.max,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              ElevatedButton(
-                                                onPressed: () {
-                                                  int index = (log?.sets ?? [])
-                                                      .indexWhere(
-                                                        (s) =>
-                                                            s.exerciseId ==
-                                                            exercise.id!,
-                                                      );
-                                                  if (index >= 0) {
-                                                    setState(() {
-                                                      (log?.sets ?? [])
-                                                          .removeAt(index);
+                if (loggerState is ChosenTraining)
+                  Expanded(
+                    child: ListView(
+                      children: [
+                        ...setsGroupedByExerciseId.entries.map((entry) {
+                          final exerciseId = entry.key;
+                          final sets = entry.value;
+                          final exercise = loggerState.training!.exercises
+                              .firstWhere((e) => e.id == exerciseId);
 
-                                                      log = log;
-                                                    });
-                                                  }
-                                                },
-                                                child: Text('Remove a set'),
-                                              ),
-                                              ElevatedButton(
-                                                onPressed: () {
-                                                  setState(() {
-                                                    log = log?.copyWith(
-                                                      sets: [
-                                                        ...(log?.sets ?? []),
-                                                        Set.empty(
-                                                          exerciseId:
-                                                              exercise.id!,
-                                                        ),
-                                                      ],
-                                                    );
-                                                  });
-                                                },
-                                                child: Text(
-                                                  'Add one more set!',
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
+                          return Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    exercise.exerciseName ?? 'Unknown',
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.titleMedium,
                                   ),
-                                );
-                              }).values,
-                            ],
-                          ),
-                        );
-                      } else {
-                        return Center(
-                          child: Text(
-                            'LoggerDetails::build - LoggerState is wrong: ${loggerState.runtimeType}',
-                          ),
-                        );
-                      }
-                    },
+                                  ...sets.asMap().entries.map((setEntry) {
+                                    final setIndex = setEntry.key;
+                                    final set = setEntry.value;
+                                    return LoggerSetRow(
+                                      idx: setIndex,
+                                      exerciseId: exerciseId,
+                                      reps: set.reps,
+                                      kgs: set.kgs,
+                                    );
+                                  }),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          int index = (log?.sets ?? [])
+                                              .lastIndexWhere(
+                                                (s) =>
+                                                    s.exerciseId == exerciseId,
+                                              );
+                                          if (index >= 0) {
+                                            setState(() {
+                                              log?.sets.removeAt(index);
+                                            });
+                                          }
+                                        },
+                                        child: Text(
+                                          AppLocalizations.of(
+                                            context,
+                                          )!.removeSet,
+                                        ),
+                                      ),
+                                      SizedBox(width: 8),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            log = log?.copyWith(
+                                              sets: [
+                                                ...(log?.sets ?? []),
+                                                Set.empty(
+                                                  exerciseId: exerciseId,
+                                                ),
+                                              ],
+                                            );
+                                          });
+                                        },
+                                        child: Text(
+                                          AppLocalizations.of(context)!.addSet,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }),
+                      ],
+                    ),
+                  )
+                else
+                  Center(
+                    child: Text(
+                      'LoggerDetails::build - LoggerState is wrong: ${loggerState.runtimeType}',
+                    ),
                   ),
-                ),
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: Divider(),
@@ -244,11 +224,34 @@ class _LoggerDetailsState extends State<LoggerDetails> {
                         if (log != null) {
                           final date =
                               _formKey.currentState?.fields['date']?.value;
-                          context.read<LogBloc>().add(
-                            AddLogsEvent([
-                              log!.copyWith(sets: sets, createdAt: date),
-                            ]),
+                          final updatedLog = log!.copyWith(
+                            sets: sets,
+                            createdAt: date,
                           );
+
+                          if (widget.logToEdit != null) {
+                            context.read<LogBloc>().add(
+                              UpdateLogEvent(
+                                updatedLog,
+                                onComplete: (success, {data}) {
+                                  if (success) {
+                                    Navigator.pop(context);
+                                  }
+                                },
+                              ),
+                            );
+                          } else {
+                            context.read<LogBloc>().add(
+                              AddLogsEvent(
+                                [updatedLog],
+                                onComplete: (success, {data}) {
+                                  if (success) {
+                                    Navigator.pop(context);
+                                  }
+                                },
+                              ),
+                            );
+                          }
                         }
                       },
                     ),

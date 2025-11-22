@@ -1,3 +1,4 @@
+import 'package:fitsanny/l10n/app_localizations.dart';
 import 'package:fitsanny/pages/home/charts/chart_bloc.dart';
 import 'package:fitsanny/pages/home/charts/chart_event.dart';
 import 'package:fitsanny/pages/home/charts/chart_provider.dart';
@@ -17,18 +18,19 @@ class HomePage extends StatelessWidget {
         builder: (context) {
           // Trigger load
           context.read<ChartBloc>().add(LoadCharts());
-
           return Column(
             spacing: 8.0,
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'Guten ${_getGreetingForTimeOfDay()}, Sanny 🧚🏼‍♀️',
+                AppLocalizations.of(
+                  context,
+                )!.homeGreeting(_getGreetingForTimeOfDay()),
                 style: TextStyle(fontSize: 32, fontWeight: FontWeight.w500),
               ),
               Text(
-                '☀️ Looks like a great moment for a training ☀️',
+                AppLocalizations.of(context)!.homeSubtitle,
                 style: TextStyle(fontSize: 24, fontStyle: FontStyle.italic),
               ),
               Expanded(
@@ -39,9 +41,7 @@ class HomePage extends StatelessWidget {
                     } else if (state is ChartsLoaded) {
                       if (state.charts.isEmpty) {
                         return Center(
-                          child: Text(
-                            'No goals set yet. Go to Profile > Goals to add some!',
-                          ),
+                          child: Text(AppLocalizations.of(context)!.noGoalsSet),
                         );
                       }
                       return SingleChildScrollView(

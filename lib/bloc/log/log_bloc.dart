@@ -70,6 +70,17 @@ class LogBloc extends Bloc<LogEvent, LogState> {
         );
       }
     });
+    on<UpdateLogEvent>((event, emit) async {
+      try {
+        emit(LogsLoading());
+        await _logRepository.updateLog(event.log);
+        event.onComplete?.call(true);
+        _fileService.backupDatabase(await _databaseBloc.databasePath);
+      } catch (e) {
+        event.onComplete?.call(false);
+        emit(LogError('Failed to update log: $e'));
+      }
+    });
   }
 }
 

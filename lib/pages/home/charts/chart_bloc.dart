@@ -1,10 +1,10 @@
-import 'package:bloc/bloc.dart';
 import 'package:fitsanny/pages/home/charts/chart_data.dart';
 import 'package:fitsanny/pages/home/charts/chart_event.dart';
 import 'package:fitsanny/pages/home/charts/chart_state.dart';
 import 'package:fitsanny/repositories/exercise_name_repository.dart';
 import 'package:fitsanny/repositories/goal_repository.dart';
 import 'package:fitsanny/repositories/log_repository.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ChartBloc extends Bloc<ChartEvent, ChartState> {
   final GoalRepository _goalRepository;

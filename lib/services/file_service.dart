@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:external_path/external_path.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:path_provider/path_provider.dart';
 
 class FileService {
   Future<void> saveFile(String fileName, List<int> bytes) async {

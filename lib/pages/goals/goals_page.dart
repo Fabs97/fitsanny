@@ -7,6 +7,7 @@ import 'package:fitsanny/model/goal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:fitsanny/l10n/app_localizations.dart';
 
 class GoalsPage extends StatefulWidget {
   const GoalsPage({super.key});
@@ -30,7 +31,11 @@ class _GoalsPageState extends State<GoalsPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text(goal == null ? 'Add Goal' : 'Edit Goal'),
+          title: Text(
+            goal == null
+                ? AppLocalizations.of(context)!.addGoalTitle
+                : AppLocalizations.of(context)!.editGoalTitle,
+          ),
           content: FormBuilder(
             key: formKey,
             child: Column(
@@ -42,7 +47,11 @@ class _GoalsPageState extends State<GoalsPage> {
                       return FormBuilderDropdown<int>(
                         name: 'exercise_id',
                         initialValue: goal?.exerciseId,
-                        decoration: InputDecoration(labelText: 'Exercise'),
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(
+                            context,
+                          )!.exerciseLabel,
+                        ),
                         items: state.exerciseNames
                             .map(
                               (e) => DropdownMenuItem(
@@ -59,7 +68,7 @@ class _GoalsPageState extends State<GoalsPage> {
                 SizedBox(height: 16),
                 FormStepper(
                   name: 'reps',
-                  label: 'Target Reps',
+                  label: AppLocalizations.of(context)!.targetRepsLabel,
                   initialValue: goal?.reps.toDouble() ?? 10,
                   step: 1,
                   isInteger: true,
@@ -67,7 +76,7 @@ class _GoalsPageState extends State<GoalsPage> {
                 SizedBox(height: 16),
                 FormStepper(
                   name: 'kgs',
-                  label: 'Target Kgs',
+                  label: AppLocalizations.of(context)!.targetKgsLabel,
                   initialValue: goal?.kgs ?? 20.0,
                   step: 0.5,
                 ),
@@ -77,7 +86,7 @@ class _GoalsPageState extends State<GoalsPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Cancel'),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             TextButton(
               onPressed: () {
@@ -98,7 +107,7 @@ class _GoalsPageState extends State<GoalsPage> {
                   Navigator.pop(context);
                 }
               },
-              child: Text('Save'),
+              child: Text(AppLocalizations.of(context)!.save),
             ),
           ],
         );

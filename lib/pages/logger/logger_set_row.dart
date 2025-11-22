@@ -1,5 +1,6 @@
 import 'package:fitsanny/components/form_stepper.dart';
 import 'package:flutter/material.dart';
+import 'package:fitsanny/l10n/app_localizations.dart';
 
 class LoggerSetRow extends StatelessWidget {
   final int idx;
@@ -21,11 +22,11 @@ class LoggerSetRow extends StatelessWidget {
       mainAxisSize: MainAxisSize.max,
       spacing: 8.0,
       children: [
-        Text('Set #${idx + 1}'),
+        Text(AppLocalizations.of(context)!.setLabel(idx + 1)),
         Expanded(
           child: FormStepper(
             name: 'kgs_${exerciseId}_$idx',
-            label: 'kgs',
+            label: AppLocalizations.of(context)!.kgsLabel,
             step: 0.5,
             initialValue: kgs,
           ),
@@ -33,7 +34,7 @@ class LoggerSetRow extends StatelessWidget {
         Expanded(
           child: FormStepper(
             name: 'reps_${exerciseId}_$idx',
-            label: 'reps',
+            label: AppLocalizations.of(context)!.repsLabel,
             step: 1,
             initialValue: reps,
             isInteger: true,

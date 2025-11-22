@@ -3,6 +3,7 @@ import 'package:fitsanny/pages/home/home.dart';
 import 'package:fitsanny/pages/logger/logger_details.dart';
 import 'package:fitsanny/pages/logger/logger_home.dart';
 import 'package:fitsanny/pages/logger/logger_shell_router.dart';
+import 'package:fitsanny/model/log.dart';
 import 'package:fitsanny/model/training.dart';
 import 'package:fitsanny/pages/training/training_form.dart';
 import 'package:fitsanny/pages/training/training_home.dart';
@@ -50,6 +51,13 @@ final _router = GoRouter(
                 GoRoute(
                   path: '/new',
                   builder: (context, state) => const LoggerDetails(),
+                ),
+                GoRoute(
+                  path: '/edit',
+                  builder: (context, state) {
+                    final log = state.extra as Log;
+                    return LoggerDetails(logToEdit: log);
+                  },
                 ),
               ],
             ),

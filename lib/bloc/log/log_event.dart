@@ -41,3 +41,11 @@ class AddLogsEvent extends LogEvent {
   @override
   List<Object> get props => [logs, ...super.props];
 }
+
+class UpdateLogEvent extends LogEvent {
+  final Log log;
+  const UpdateLogEvent(this.log, {super.onComplete});
+
+  @override
+  List<Object> get props => [log, ...super.props];
+}

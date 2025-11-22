@@ -138,4 +138,34 @@ class TrainingRepository {
       }
     });
   }
+
+  Future<Training?> getTraining(int id) async {
+    final List<Map<String, dynamic>> trainingMaps = await _database.query(
+      'training',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+
+    if (trainingMaps.isEmpty) return null;
+
+    final trainingMap = trainingMaps.first;
+    final List<Map<String, dynamic>> exerciseMaps = await _database.rawQuery(
+      'SELECT e.*, en.name FROM ${getDatabaseTable(DatabaseTablesEnum.exercise)} e '
+      'LEFT JOIN ${getDatabaseTable(DatabaseTablesEnum.exerciseName)} en ON e.exercise_name_id = en.id '
+      'LEFT JOIN ${getDatabaseTable(DatabaseTablesEnum.trainingExercise)} te ON e.id = te.exercise_id '
+      'WHERE te.training_id = ?',
+      [trainingMap['id']],
+    );
+
+    List<Exercise> exercises = exerciseMaps
+        .map((e) => Exercise.fromJson(e))
+        .toList();
+
+    return Training(
+      id: trainingMap['id'],
+      title: trainingMap['title'],
+      description: trainingMap['description'],
+      exercises: exercises,
+    );
+  }
 }

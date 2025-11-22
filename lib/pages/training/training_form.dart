@@ -1,11 +1,13 @@
 import 'package:fitsanny/bloc/exercise_name/exercise_name_bloc.dart';
 import 'package:fitsanny/bloc/training/training_bloc.dart';
+import 'package:fitsanny/model/exercise.dart';
 import 'package:fitsanny/pages/training/exercise_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:go_router/go_router.dart';
+import 'package:fitsanny/l10n/app_localizations.dart';
 
 class TrainingForm extends StatefulWidget {
   const TrainingForm({super.key});
@@ -25,143 +27,116 @@ class _TrainingFormState extends State<TrainingForm> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<TrainingBloc, TrainingState>(
-      builder: (context, state) {
-        if (state is! NewTraining) {
-          return Center(child: Text('Loading...'));
-        }
-        return FormBuilder(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            spacing: 10.0,
-            children: [
-              FormBuilderTextField(
-                name: 'title',
-                initialValue: state.newTraining.title,
-                onChanged: (value) => state.newTraining.copyWith(title: value),
-                decoration: const InputDecoration(
-                  labelText: 'Title',
-                  suffixIcon: Icon(Icons.edit),
-                ),
-                validator: FormBuilderValidators.compose([
-                  FormBuilderValidators.required(),
-                ]),
-              ),
-              FormBuilderTextField(
-                name: 'description',
-                initialValue: state.newTraining.description,
-                onChanged: (value) =>
-                    state.newTraining.copyWith(description: value),
-                decoration: const InputDecoration(
-                  labelText: 'Description',
-                  suffixIcon: Icon(Icons.description),
-                ),
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    spacing: 8.0,
-                    children: state.newTraining.exercises
-                        .asMap()
-                        .map(
-                          (idx, _) =>
-                              MapEntry(idx, ExerciseRow(exerciseIndex: idx)),
-                        )
-                        .values
-                        .toList()
-                        .cast<Widget>(),
-                  ),
-                ),
-              ),
-              Divider(),
-              Row(
-                spacing: 10.0,
-                mainAxisAlignment: MainAxisAlignment.end,
+    return Scaffold(
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.addTraining)),
+      body: BlocConsumer<TrainingBloc, TrainingState>(
+        listener: (context, state) {
+          if (state is TrainingsLoaded) {
+            context.go('/training');
+          } else if (state is TrainingsError) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.message)));
+          }
+        },
+        builder: (context, state) {
+          if (state is! NewTraining) {
+            return Center(child: Text(AppLocalizations.of(context)!.loading));
+          }
+
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: FormBuilder(
+              key: _formKey,
+              child: Column(
                 children: [
+                  FormBuilderTextField(
+                    name: 'title',
+                    initialValue: state.newTraining.title,
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)!.titleLabel,
+                    ),
+                    onChanged: (value) {
+                      context.read<TrainingBloc>().add(
+                        NewTrainingEvent(
+                          training: state.newTraining.copyWith(title: value),
+                        ),
+                      );
+                    },
+                    validator: FormBuilderValidators.required(),
+                  ),
+                  SizedBox(height: 16),
+                  FormBuilderTextField(
+                    name: 'description',
+                    initialValue: state.newTraining.description,
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)!.descriptionLabel,
+                    ),
+                    onChanged: (value) {
+                      context.read<TrainingBloc>().add(
+                        NewTrainingEvent(
+                          training: state.newTraining.copyWith(
+                            description: value,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  SizedBox(height: 16),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: state.newTraining.exercises.length,
+                      itemBuilder: (context, index) {
+                        return Row(
+                          children: [
+                            Expanded(child: ExerciseRow(exerciseIndex: index)),
+                            IconButton(
+                              icon: Icon(Icons.delete),
+                              onPressed: () {
+                                final updatedExercises = List<Exercise>.from(
+                                  state.newTraining.exercises,
+                                )..removeAt(index);
+                                context.read<TrainingBloc>().add(
+                                  NewTrainingEvent(
+                                    training: state.newTraining.copyWith(
+                                      exercises: updatedExercises,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
                       context.read<TrainingBloc>().add(
                         AddExerciseToNewTrainingEvent(),
                       );
                     },
-                    child: Text('Add Exercise'),
+                    child: Text(AppLocalizations.of(context)!.addExercise),
                   ),
+                  SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
-                      print(state.newTraining);
-                      // Extract updated exercises from form fields
-                      final updatedExercises = state.newTraining.exercises
-                          .asMap()
-                          .entries
-                          .map((e) {
-                            final idx = e.key;
-                            final exercise = e.value;
-                            final reps = _formKey
-                                .currentState
-                                ?.fields['reps_$idx']
-                                ?.value;
-                            final kgs = _formKey
-                                .currentState
-                                ?.fields['kgs_$idx']
-                                ?.value;
-
-                            return exercise.copyWith(
-                              reps: reps is String
-                                  ? int.tryParse(reps) ?? exercise.reps
-                                  : (reps as num?)?.toInt() ?? exercise.reps,
-                              kgs: kgs is String
-                                  ? double.tryParse(kgs) ?? exercise.kgs
-                                  : (kgs as num?)?.toDouble() ?? exercise.kgs,
-                            );
-                          })
-                          .toList();
-
-                      final updatedTraining = state.newTraining.copyWith(
-                        title:
-                            _formKey.currentState?.fields['title']!.value ??
-                            state.newTraining.title,
-                        description:
-                            _formKey.currentState?.fields['description']?.value,
-                        exercises: updatedExercises,
-                      );
-
-                      final event = state.newTraining.id != null
-                          ? UpdateTrainingEvent(
-                              updatedTraining,
-                              onComplete: (success) {
-                                if (success && context.mounted) {
-                                  context.go('/training');
-                                }
-                                if (!success) {
-                                  // TODO: add snackbar
-                                  print("Error updating a training");
-                                }
-                              },
-                            )
-                          : AddTrainingEvent(
-                              updatedTraining,
-                              onComplete: (success) {
-                                if (success && context.mounted) {
-                                  context.go('/training');
-                                }
-                                if (!success) {
-                                  // TODO: add snackbar
-                                  print("Error adding a training");
-                                }
-                              },
-                            );
-
-                      context.read<TrainingBloc>().add(event);
+                      if (_formKey.currentState?.saveAndValidate() ?? false) {
+                        final event = state.newTraining.id != null
+                            ? UpdateTrainingEvent(state.newTraining)
+                            : AddTrainingEvent(state.newTraining);
+                        context.read<TrainingBloc>().add(event);
+                      }
                     },
-                    child: Text('Save'),
+                    child: Text(AppLocalizations.of(context)!.save),
                   ),
                 ],
               ),
-            ],
-          ),
-        );
-      },
+            ),
+          );
+        },
+      ),
     );
   }
 }

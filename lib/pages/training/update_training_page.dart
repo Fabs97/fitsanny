@@ -11,31 +11,12 @@ class UpdateTrainingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Update Training')),
-      body: BlocProvider.value(
-        value: context.read<TrainingBloc>(),
-        child: Builder(
-          builder: (context) {
-            // Initialize the bloc with the training to be edited
-            // We need to do this in a microtask or post-frame callback to avoid
-            // modifying state during build, or better yet, use a separate event
-            // to set the "editing" state.
-            // However, TrainingForm expects NewTraining state.
-            // Let's emit NewTraining with the existing training data.
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              context.read<TrainingBloc>().add(
-                NewTrainingEvent(training: training),
-              );
-            });
+    // Initialize the bloc with the training to be edited
+    // We use a microtask to avoid updating state during build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<TrainingBloc>().add(NewTrainingEvent(training: training));
+    });
 
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: TrainingForm(),
-            );
-          },
-        ),
-      ),
-    );
+    return TrainingForm();
   }
 }

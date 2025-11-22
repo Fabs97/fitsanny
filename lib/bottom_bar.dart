@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:fitsanny/l10n/app_localizations.dart';
 
 class AppBottomBar extends StatelessWidget {
   const AppBottomBar({super.key});
@@ -23,18 +24,22 @@ class AppBottomBar extends StatelessWidget {
                 children: [
                   IconButton(
                     icon: Icon(Icons.home),
+                    tooltip: AppLocalizations.of(context)!.homeTooltip,
                     onPressed: () => context.go('/home'),
                   ),
                   IconButton(
                     icon: Icon(Icons.fitness_center),
+                    tooltip: AppLocalizations.of(context)!.trainingTooltip,
                     onPressed: () => context.go('/training'),
                   ),
                   IconButton(
                     icon: Icon(Icons.edit_note),
+                    tooltip: AppLocalizations.of(context)!.logTooltip,
                     onPressed: () => context.go('/log'),
                   ),
                   IconButton(
-                    icon: Icon(Icons.military_tech),
+                    icon: Icon(Icons.workspace_premium),
+                    tooltip: AppLocalizations.of(context)!.goalsTooltip,
                     onPressed: () => context.go('/goals'),
                   ),
                 ],

@@ -174,4 +174,32 @@ class LogRepository {
     }
     return null;
   }
+
+  Future<void> updateLog(Log log) async {
+    await _database.transaction((txn) async {
+      // Update the log entry
+      await txn.update(
+        getDatabaseTable(DatabaseTablesEnum.log),
+        log.toMap(),
+        where: 'id = ?',
+        whereArgs: [log.id],
+      );
+
+      // Delete existing sets for this log
+      await txn.delete(
+        getDatabaseTable(DatabaseTablesEnum.set),
+        where: 'log_id = ?',
+        whereArgs: [log.id],
+      );
+
+      // Insert new sets
+      for (final set in log.sets) {
+        await txn.insert(
+          getDatabaseTable(DatabaseTablesEnum.set),
+          set.copyWith(logId: log.id).toMap(),
+          conflictAlgorithm: ConflictAlgorithm.fail,
+        );
+      }
+    });
+  }
 }

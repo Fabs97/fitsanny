@@ -1,5 +1,6 @@
-import 'package:fitsanny/pages/home/charts/chart_data.dart';
+import 'package:fitsanny/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:fitsanny/pages/home/charts/chart_data.dart';
 
 class GoalProgressChart extends StatelessWidget {
   final ChartData data;
@@ -32,14 +33,14 @@ class GoalProgressChart extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Current: ${currentKgs}kg'),
-                Text('Goal: ${goalKgs}kg'),
+                Text(AppLocalizations.of(context)!.goalCurrent(currentKgs)),
+                Text(AppLocalizations.of(context)!.goalTarget(goalKgs)),
               ],
             ),
             if (data.latestSet != null) ...[
               SizedBox(height: 4),
               Text(
-                '${data.latestSet!.reps} reps',
+                AppLocalizations.of(context)!.reps(data.latestSet!.reps),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],

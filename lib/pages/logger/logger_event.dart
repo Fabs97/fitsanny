@@ -7,8 +7,18 @@ class LoggerEvent extends Equatable {
 
 class ChooseTraining extends LoggerEvent {
   final Training training;
-  ChooseTraining({required this.training});
+
+  ChooseTraining(this.training);
 
   @override
-  List<Object?> get props => [training];
+  List<Object> get props => [training];
+}
+
+class LoadTraining extends LoggerEvent {
+  final int trainingId;
+
+  LoadTraining(this.trainingId);
+
+  @override
+  List<Object> get props => [trainingId];
 }

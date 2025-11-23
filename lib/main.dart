@@ -16,8 +16,13 @@ void main() async {
 
   // Request storage permission at startup on Android
   if (Platform.isAndroid) {
-    final status = await Permission.storage.status;
-    if (!status.isGranted) {
+    // Check for Android 11+ first
+    if (await Permission.manageExternalStorage.status.isDenied) {
+      await Permission.manageExternalStorage.request();
+    }
+
+    // Check for older Android versions
+    if (await Permission.storage.status.isDenied) {
       await Permission.storage.request();
     }
   }

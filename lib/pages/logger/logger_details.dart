@@ -3,6 +3,7 @@ import 'package:fitsanny/bloc/log/log_cubit.dart';
 import 'package:fitsanny/l10n/app_localizations.dart';
 import 'package:fitsanny/model/log.dart';
 import 'package:fitsanny/model/set.dart';
+import 'package:fitsanny/model/training.dart';
 import 'package:fitsanny/pages/logger/logger_cubit.dart';
 import 'package:fitsanny/pages/logger/logger_set_row.dart';
 import 'package:flutter/material.dart';
@@ -19,12 +20,12 @@ class LoggerDetails extends StatefulWidget {
 
 class _LoggerDetailsState extends State<LoggerDetails> {
   final GlobalKey<FormBuilderState> _formKey = GlobalKey<FormBuilderState>();
-  late Log? log;
+  Log? log;
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    LogState currentLogState = BlocProvider.of<LogCubit>(context).state;
     LoggerState currentLoggerState = BlocProvider.of<LoggerCubit>(
       context,
     ).state;
@@ -32,30 +33,62 @@ class _LoggerDetailsState extends State<LoggerDetails> {
     if (widget.logToEdit != null) {
       log = widget.logToEdit;
       context.read<LoggerCubit>().loadTraining(widget.logToEdit!.trainingId);
-    } else if (currentLogState is LogsLoaded) {
-      final logs = currentLogState.logs;
-
-      // Only create a log if training is selected
+    } else {
+      // New Log
       if (currentLoggerState.training != null) {
-        log = Log(
-          trainingId: currentLoggerState.training!.id!,
-          sets: logs.isEmpty
-              // No logs available yet
-              ? currentLoggerState.training!.exercises
-                    .map(
-                      (e) => Set(exerciseId: e.id!, reps: e.reps, kgs: e.kgs),
-                    )
-                    .toList()
-              : logs.first.sets,
+        _initializeNewLog(currentLoggerState.training!);
+      }
+    }
+  }
+
+  Future<void> _initializeNewLog(Training training) async {
+    setState(() {
+      isLoading = true;
+    });
+
+    final lastLog = await context.read<LogCubit>().getLatestLog(training.id!);
+    final lastLogSets = lastLog?.sets ?? <Set>[];
+    final trainingExercises = training.exercises;
+
+    final newSets = trainingExercises.map((exercise) {
+      // Try to find a matching set in the last log
+      final matchingSet = lastLogSets.firstWhereOrNull(
+        (s) => s.exerciseId == exercise.id,
+      );
+
+      if (matchingSet != null) {
+        // Use values from the last log
+        return Set(
+          exerciseId: exercise.id!,
+          reps: matchingSet.reps,
+          kgs: matchingSet.kgs,
+        );
+      } else {
+        // Use default values from the training
+        return Set(
+          exerciseId: exercise.id!,
+          reps: exercise.reps,
+          kgs: exercise.kgs,
         );
       }
+    }).toList();
+
+    if (mounted) {
+      setState(() {
+        log = Log(trainingId: training.id!, sets: newSets);
+        isLoading = false;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading || log == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     final Map<int, List<Set>> setsGroupedByExerciseId = groupBy<Set, int>(
-      log?.sets ?? [],
+      log!.sets,
       (Set set) => set.exerciseId,
     );
 
@@ -78,7 +111,9 @@ class _LoggerDetailsState extends State<LoggerDetails> {
                     suffixIcon: Icon(Icons.calendar_today),
                   ),
                 ),
-                if (loggerState is ChosenTraining)
+                if (loggerState is ChosenTraining &&
+                    loggerState.training != null &&
+                    loggerState.training!.id == log!.trainingId)
                   Expanded(
                     child: ListView(
                       children: [
@@ -163,10 +198,8 @@ class _LoggerDetailsState extends State<LoggerDetails> {
                     ),
                   )
                 else
-                  Center(
-                    child: Text(
-                      'LoggerDetails::build - LoggerState is wrong: ${loggerState.runtimeType}',
-                    ),
+                  const Expanded(
+                    child: Center(child: CircularProgressIndicator()),
                   ),
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0),

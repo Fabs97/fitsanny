@@ -12,6 +12,9 @@ class LogCubit extends Cubit<LogState> {
   final FileService _fileService;
   final DatabaseCubit _databaseCubit;
 
+  // Track the last filter used to load logs
+  Map<String, dynamic>? _lastFilter;
+
   LogCubit({
     required LogRepository repository,
     required FileService fileService,
@@ -26,30 +29,42 @@ class LogCubit extends Cubit<LogState> {
     DateTime end, {
     Function(bool, {dynamic data})? onComplete,
   }) async {
-    try {
-      emit(LogsLoading());
-      final logs = await _logRepository.getLogsBetween(start, end);
-      emit(LogsLoaded(logs));
-      onComplete?.call(true);
-    } catch (e) {
-      print(e);
-      onComplete?.call(false);
-      emit(LogError('Failed to load logs with time range'));
-    }
+    _lastFilter = {'type': 'timeSpan', 'start': start, 'end': end};
+    await _reload(onComplete: onComplete);
   }
 
   Future<void> loadLogs(
     int trainingId, {
     Function(bool, {dynamic data})? onComplete,
   }) async {
+    _lastFilter = {'type': 'training', 'id': trainingId};
+    await _reload(onComplete: onComplete);
+  }
+
+  Future<void> _reload({Function(bool, {dynamic data})? onComplete}) async {
+    if (_lastFilter == null) return;
+
     try {
       emit(LogsLoading());
-      final logs = await _logRepository.getLatestLogsForTraining(trainingId);
+      List<Log> logs = [];
+
+      if (_lastFilter!['type'] == 'timeSpan') {
+        logs = await _logRepository.getLogsBetween(
+          _lastFilter!['start'],
+          _lastFilter!['end'],
+        );
+      } else if (_lastFilter!['type'] == 'training') {
+        logs = await _logRepository.getLatestLogsForTraining(
+          _lastFilter!['id'],
+        );
+      }
+
       emit(LogsLoaded(logs));
       onComplete?.call(true);
     } catch (e) {
+      print(e);
       onComplete?.call(false);
-      emit(LogError('Failed to load logs for trainingId: $trainingId'));
+      emit(LogError('Failed to load logs'));
     }
   }
 
@@ -61,7 +76,10 @@ class LogCubit extends Cubit<LogState> {
       emit(LogsLoading());
 
       final newLogs = await _logRepository.insertLogs(logs);
-      emit(LogsLoaded(newLogs));
+
+      // Reload the current view instead of just emitting new logs
+      await _reload();
+
       onComplete?.call(true, data: newLogs);
 
       // Trigger backup
@@ -79,12 +97,28 @@ class LogCubit extends Cubit<LogState> {
     try {
       emit(LogsLoading());
       await _logRepository.updateLog(log);
+
+      // Reload the current view
+      await _reload();
+
       onComplete?.call(true);
       _fileService.backupDatabase(await _databaseCubit.databasePath);
     } catch (e) {
       onComplete?.call(false);
       emit(LogError('Failed to update log: $e'));
     }
+  }
+
+  Future<Log?> getLatestLog(int trainingId) async {
+    try {
+      final logs = await _logRepository.getLatestLogsForTraining(trainingId);
+      if (logs.isNotEmpty) {
+        return logs.first;
+      }
+    } catch (e) {
+      print('Failed to get latest log for training $trainingId: $e');
+    }
+    return null;
   }
 }
 

@@ -63,14 +63,12 @@ Widget loggerShellRouterBuilder(
                                   (e) => ListTile(
                                     title: Text(e.title),
                                     onTap: () {
-                                      // Load logs for the chosen training, and
-                                      // navigate to the logger details when done.
-                                      context.read<LogCubit>().loadLogs(
-                                        e.id!,
-                                        onComplete: (success, {data}) =>
-                                            // Use absolute path to be explicit.
-                                            context.go('/log/new'),
-                                      );
+                                      // Update logger state (no navigation here).
+                                      context
+                                          .read<LoggerCubit>()
+                                          .chooseTraining(e);
+
+                                      context.go('/log/new');
 
                                       // Update logger state (no navigation here).
                                       context

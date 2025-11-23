@@ -8,16 +8,24 @@ class FileService {
   /// Returns true if permission is granted
   Future<bool> requestStoragePermission() async {
     try {
-      // Check Android version and request appropriate permissions
       if (Platform.isAndroid) {
-        // For Android 13+ (API 33+), we don't need storage permission for app-specific directories
-        // But we need it for accessing Documents folder
+        // Check if we are on Android 11+ (API 30+)
+        // On Android 11+, we need MANAGE_EXTERNAL_STORAGE to access shared Documents folder
+        // especially for files created by previous installations
+        if (await Permission.manageExternalStorage.status.isGranted) {
+          return true;
+        }
+
+        if (await Permission.manageExternalStorage.request().isGranted) {
+          return true;
+        }
+
+        // Fallback for older Android versions (< 11)
         final status = await Permission.storage.request();
 
         if (status.isGranted) {
           return true;
         } else if (status.isPermanentlyDenied) {
-          // User has permanently denied permission
           print('⚠️ Storage permission permanently denied');
           await openAppSettings();
           return false;

@@ -24,6 +24,7 @@ List<Log> fromLogsWithSetMapToFlutterClasses(List<Map<String, Object?>> rows) {
       logsMap[logId] = Log(
         id: logId,
         trainingId: row['training_id'] as int,
+        trainingName: row['training_name'] as String?,
         createdAt: DateTime.tryParse(row['created_at'] as String),
         sets: [
           Set(

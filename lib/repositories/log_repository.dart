@@ -63,6 +63,7 @@ class LogRepository {
       l.id AS log_id,
       l.training_id,
       l.created_at,
+      t.title AS training_name,
       s.id AS set_id,
       s.exercise_id AS set_exercise_id,
       s.reps AS set_reps,
@@ -73,6 +74,7 @@ class LogRepository {
         '''
     FROM $logTable l
     JOIN $setTable s ON s.log_id = l.id
+    LEFT JOIN ${getDatabaseTable(DatabaseTablesEnum.training)} t ON l.training_id = t.id
   ''';
 
     // Optional join + where parts
@@ -147,7 +149,7 @@ class LogRepository {
     return newLogs;
   }
 
-  Future<Set?> getLatestSetForExercise(int exerciseId) async {
+  Future<Set?> getLatestSetForExercise(int exerciseNameId) async {
     final rows = await _database.rawQuery(
       '''
     SELECT
@@ -160,13 +162,15 @@ class LogRepository {
       ${getDatabaseTable(DatabaseTablesEnum.set)} s
     JOIN
       ${getDatabaseTable(DatabaseTablesEnum.log)} l ON s.log_id = l.id
+    JOIN
+      ${getDatabaseTable(DatabaseTablesEnum.exercise)} e ON s.exercise_id = e.id
     WHERE
-      s.exercise_id = ?
+      e.exercise_name_id = ?
     ORDER BY
       l.created_at DESC
     LIMIT 1
     ''',
-      [exerciseId],
+      [exerciseNameId],
     );
 
     if (rows.isNotEmpty) {

@@ -45,9 +45,7 @@ class _LoggerHomeState extends State<LoggerHome> {
                 final log = state.logs[index];
                 return ListTile(
                   title: Text(
-                    DateFormat(
-                      'yyyy-MM-dd HH:mm',
-                    ).format(log.createdAt ?? DateTime.now()),
+                    '${log.trainingName ?? 'Unknown Training'} - ${DateFormat('yyyy-MM-dd').format(log.createdAt ?? DateTime.now())}',
                   ),
                   subtitle: Text(
                     AppLocalizations.of(context)!.setsCount(log.sets.length),

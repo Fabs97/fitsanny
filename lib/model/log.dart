@@ -8,12 +8,14 @@ class Log extends Equatable {
   final int trainingId;
   final List<Set> sets;
   final DateTime? createdAt;
+  final String? trainingName;
 
   const Log({
     this.id,
     required this.trainingId,
     required this.sets,
     this.createdAt,
+    this.trainingName,
   });
 
   factory Log.fromJson(Map<String, dynamic> json) => Log(
@@ -21,6 +23,7 @@ class Log extends Equatable {
     trainingId: json['training_id'],
     sets: jsonDecode(json['sets'] ?? []),
     createdAt: DateTime.tryParse(json['created_at']),
+    trainingName: json['training_name'],
   );
 
   Map<String, Object?> toMap() {
@@ -29,21 +32,23 @@ class Log extends Equatable {
 
   @override
   String toString() {
-    return 'Log { id: $id, trainingId: $trainingId, sets: [ ${sets.map((s) => s.toMap()).join(', ')} ], createdAt: ${createdAt.toString()}}';
+    return 'Log { id: $id, trainingId: $trainingId, trainingName: $trainingName, sets: [ ${sets.map((s) => s.toMap()).join(', ')} ], createdAt: ${createdAt.toString()}}';
   }
 
   @override
-  List<Object?> get props => [id, trainingId, sets, createdAt];
+  List<Object?> get props => [id, trainingId, sets, createdAt, trainingName];
 
   Log copyWith({
     int? id,
     int? trainingId,
     List<Set>? sets,
     DateTime? createdAt,
+    String? trainingName,
   }) => Log(
     id: id ?? this.id,
     trainingId: trainingId ?? this.trainingId,
     sets: sets ?? this.sets,
     createdAt: createdAt ?? this.createdAt,
+    trainingName: trainingName ?? this.trainingName,
   );
 }

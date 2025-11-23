@@ -20,6 +20,9 @@ class FakeLoggerCubit extends Cubit<LoggerState> implements LoggerCubit {
 
   @override
   Future<void> loadTraining(int trainingId) async {}
+
+  @override
+  void clearTraining() {}
 }
 
 class FakeLogCubit extends Cubit<LogState> implements LogCubit {

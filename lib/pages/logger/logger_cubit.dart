@@ -17,6 +17,10 @@ class LoggerCubit extends Cubit<LoggerState> {
     emit(ChosenTraining(training: training));
   }
 
+  void clearTraining() {
+    emit(UnchosenTraining());
+  }
+
   Future<void> loadTraining(int trainingId) async {
     if (_trainingRepository != null) {
       final training = await _trainingRepository.getTraining(trainingId);

@@ -16,7 +16,9 @@ class _TrainingHomeState extends State<TrainingHome> {
     context.read<TrainingCubit>().loadTrainings();
     return BlocBuilder<TrainingCubit, TrainingState>(
       builder: (BuildContext context, TrainingState state) {
-        if (state is TrainingsInitial || state is TrainingsLoading) {
+        if (state is TrainingsInitial ||
+            state is TrainingsLoading ||
+            state is NewTraining) {
           return const Center(child: CircularProgressIndicator());
         } else if (state is TrainingsLoaded) {
           return TrainingsView();

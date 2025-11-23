@@ -1,6 +1,7 @@
 import 'package:fitsanny/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:fitsanny/pages/home/charts/chart_data.dart';
+import 'package:fitsanny/model/goal.dart';
 
 class GoalProgressChart extends StatelessWidget {
   final ChartData data;
@@ -9,9 +10,12 @@ class GoalProgressChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currentKgs = data.latestSet?.kgs ?? 0.0;
-    final goalKgs = data.goal.kgs;
-    final progress = (currentKgs / goalKgs).clamp(0.0, 1.0);
+    final isReps = data.goal.type == GoalType.reps;
+    final current = isReps
+        ? (data.latestSet?.reps.toDouble() ?? 0.0)
+        : (data.latestSet?.kgs ?? 0.0);
+    final target = isReps ? data.goal.reps.toDouble() : data.goal.kgs;
+    final progress = (current / target).clamp(0.0, 1.0);
 
     return Card(
       child: Padding(
@@ -33,8 +37,16 @@ class GoalProgressChart extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(AppLocalizations.of(context)!.goalCurrent(currentKgs)),
-                Text(AppLocalizations.of(context)!.goalTarget(goalKgs)),
+                Text(
+                  isReps
+                      ? '${AppLocalizations.of(context)!.reps(current.toInt())} / ${AppLocalizations.of(context)!.reps(target.toInt())}'
+                      : AppLocalizations.of(context)!.goalCurrent(current),
+                ),
+                Text(
+                  isReps
+                      ? ''
+                      : AppLocalizations.of(context)!.goalTarget(target),
+                ),
               ],
             ),
             if (data.latestSet != null) ...[

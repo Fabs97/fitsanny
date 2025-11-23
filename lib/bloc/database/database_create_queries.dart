@@ -64,6 +64,7 @@ CREATE TABLE ${getDatabaseTable(DatabaseTablesEnum.goal)}(
   exercise_id INTEGER,
   reps INTEGER,
   kgs REAL,
+  target_type TEXT,
   FOREIGN KEY(exercise_id) REFERENCES ${getDatabaseTable(DatabaseTablesEnum.exercise)}(id)
 )
 ''';

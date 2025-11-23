@@ -168,4 +168,13 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get pleaseChooseTraining => 'Scegli prima un allenamento';
+
+  @override
+  String get goalTypeLabel => 'Tipo di obiettivo';
+
+  @override
+  String get goalTypeReps => 'Ripetizioni';
+
+  @override
+  String get goalTypeWeight => 'Peso';
 }

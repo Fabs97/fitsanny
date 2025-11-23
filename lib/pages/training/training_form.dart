@@ -27,112 +27,123 @@ class _TrainingFormState extends State<TrainingForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(AppLocalizations.of(context)!.addTraining)),
-      body: BlocConsumer<TrainingCubit, TrainingState>(
-        listener: (context, state) {
-          if (state is TrainingsLoaded) {
-            context.go('/training');
-          } else if (state is TrainingsError) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(state.message)));
-          }
-        },
-        builder: (context, state) {
-          if (state is! NewTraining) {
-            return Center(child: Text(AppLocalizations.of(context)!.loading));
-          }
+    return PopScope(
+      onPopInvokedWithResult: (didPop, result) {
+        context.read<TrainingCubit>().loadTrainings();
+      },
+      child: Scaffold(
+        appBar: AppBar(title: Text(AppLocalizations.of(context)!.addTraining)),
+        body: BlocConsumer<TrainingCubit, TrainingState>(
+          listener: (context, state) {
+            if (state is TrainingsLoaded) {
+              context.go('/training');
+            } else if (state is TrainingsError) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.message)));
+            }
+          },
+          builder: (context, state) {
+            if (state is! NewTraining) {
+              return Center(child: Text(AppLocalizations.of(context)!.loading));
+            }
 
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: FormBuilder(
-              key: _formKey,
-              child: Column(
-                children: [
-                  FormBuilderTextField(
-                    name: 'title',
-                    initialValue: state.newTraining.title,
-                    decoration: InputDecoration(
-                      labelText: AppLocalizations.of(context)!.titleLabel,
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: FormBuilder(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    FormBuilderTextField(
+                      name: 'title',
+                      initialValue: state.newTraining.title,
+                      decoration: InputDecoration(
+                        labelText: AppLocalizations.of(context)!.titleLabel,
+                      ),
+                      onChanged: (value) {
+                        context.read<TrainingCubit>().startNewTraining(
+                          state.newTraining.copyWith(title: value),
+                        );
+                      },
+                      validator: FormBuilderValidators.required(),
                     ),
-                    onChanged: (value) {
-                      context.read<TrainingCubit>().startNewTraining(
-                        state.newTraining.copyWith(title: value),
-                      );
-                    },
-                    validator: FormBuilderValidators.required(),
-                  ),
-                  SizedBox(height: 16),
-                  FormBuilderTextField(
-                    name: 'description',
-                    initialValue: state.newTraining.description,
-                    decoration: InputDecoration(
-                      labelText: AppLocalizations.of(context)!.descriptionLabel,
-                    ),
-                    onChanged: (value) {
-                      context.read<TrainingCubit>().startNewTraining(
-                        state.newTraining.copyWith(description: value),
-                      );
-                    },
-                  ),
-                  SizedBox(height: 16),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: state.newTraining.exercises.length,
-                      itemBuilder: (context, index) {
-                        return Row(
-                          children: [
-                            Expanded(child: ExerciseRow(exerciseIndex: index)),
-                            IconButton(
-                              icon: Icon(Icons.delete),
-                              onPressed: () {
-                                final updatedExercises = List<Exercise>.from(
-                                  state.newTraining.exercises,
-                                )..removeAt(index);
-                                context.read<TrainingCubit>().startNewTraining(
-                                  state.newTraining.copyWith(
-                                    exercises: updatedExercises,
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
+                    SizedBox(height: 16),
+                    FormBuilderTextField(
+                      name: 'description',
+                      initialValue: state.newTraining.description,
+                      decoration: InputDecoration(
+                        labelText: AppLocalizations.of(
+                          context,
+                        )!.descriptionLabel,
+                      ),
+                      onChanged: (value) {
+                        context.read<TrainingCubit>().startNewTraining(
+                          state.newTraining.copyWith(description: value),
                         );
                       },
                     ),
-                  ),
-                  SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      context.read<TrainingCubit>().addExerciseToNewTraining(
-                        Exercise(exerciseNameId: 0, reps: 0, kgs: 0.0),
-                      );
-                    },
-                    child: Text(AppLocalizations.of(context)!.addExercise),
-                  ),
-                  SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState?.saveAndValidate() ?? false) {
-                        if (state.newTraining.id != null) {
-                          context.read<TrainingCubit>().updateTraining(
-                            state.newTraining,
+                    SizedBox(height: 16),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: state.newTraining.exercises.length,
+                        itemBuilder: (context, index) {
+                          return Row(
+                            children: [
+                              Expanded(
+                                child: ExerciseRow(exerciseIndex: index),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.delete),
+                                onPressed: () {
+                                  final updatedExercises = List<Exercise>.from(
+                                    state.newTraining.exercises,
+                                  )..removeAt(index);
+                                  context
+                                      .read<TrainingCubit>()
+                                      .startNewTraining(
+                                        state.newTraining.copyWith(
+                                          exercises: updatedExercises,
+                                        ),
+                                      );
+                                },
+                              ),
+                            ],
                           );
-                        } else {
-                          context.read<TrainingCubit>().addTraining(
-                            state.newTraining,
-                          );
+                        },
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () {
+                        context.read<TrainingCubit>().addExerciseToNewTraining(
+                          Exercise(exerciseNameId: 0, reps: 0, kgs: 0.0),
+                        );
+                      },
+                      child: Text(AppLocalizations.of(context)!.addExercise),
+                    ),
+                    SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState?.saveAndValidate() ?? false) {
+                          if (state.newTraining.id != null) {
+                            context.read<TrainingCubit>().updateTraining(
+                              state.newTraining,
+                            );
+                          } else {
+                            context.read<TrainingCubit>().addTraining(
+                              state.newTraining,
+                            );
+                          }
                         }
-                      }
-                    },
-                    child: Text(AppLocalizations.of(context)!.save),
-                  ),
-                ],
+                      },
+                      child: Text(AppLocalizations.of(context)!.save),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

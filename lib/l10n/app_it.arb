@@ -44,5 +44,8 @@
   "trainingTooltip": "Allenamento",
   "logTooltip": "Registro",
   "goalsTooltip": "Obiettivi",
-  "pleaseChooseTraining": "Scegli prima un allenamento"
+  "pleaseChooseTraining": "Scegli prima un allenamento",
+  "goalTypeLabel": "Tipo di obiettivo",
+  "goalTypeReps": "Ripetizioni",
+  "goalTypeWeight": "Peso"
 }

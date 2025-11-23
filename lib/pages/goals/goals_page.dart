@@ -81,6 +81,26 @@ class _GoalsPageState extends State<GoalsPage> {
                   initialValue: goal?.kgs ?? 20.0,
                   step: 0.5,
                 ),
+                SizedBox(height: 16),
+                FormBuilderDropdown<GoalType>(
+                  name: 'target_type',
+                  initialValue: goal?.type ?? GoalType.weight,
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.goalTypeLabel,
+                  ),
+                  items: GoalType.values
+                      .map(
+                        (e) => DropdownMenuItem(
+                          value: e,
+                          child: Text(
+                            e == GoalType.reps
+                                ? AppLocalizations.of(context)!.goalTypeReps
+                                : AppLocalizations.of(context)!.goalTypeWeight,
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ),
               ],
             ),
           ),
@@ -98,6 +118,7 @@ class _GoalsPageState extends State<GoalsPage> {
                     exerciseId: values['exercise_id'],
                     reps: (values['reps'] as num).toInt(),
                     kgs: (values['kgs'] as num).toDouble(),
+                    type: values['target_type'],
                   );
 
                   if (goal == null) {

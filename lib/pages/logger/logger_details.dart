@@ -211,6 +211,7 @@ class _LoggerDetailsState extends State<LoggerDetails> {
                     IconButton.filled(
                       icon: Icon(Icons.save, size: 32),
                       onPressed: () {
+                        _formKey.currentState?.save();
                         final temp = <String, Map<String, dynamic>>{};
 
                         for (final entry

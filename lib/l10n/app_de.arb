@@ -44,5 +44,8 @@
   "trainingTooltip": "Training",
   "logTooltip": "Protokoll",
   "goalsTooltip": "Ziele",
-  "pleaseChooseTraining": "Bitte wähle zuerst ein Training"
+  "pleaseChooseTraining": "Bitte wähle zuerst ein Training",
+  "goalTypeLabel": "Zieltyp",
+  "goalTypeReps": "Wiederholungen",
+  "goalTypeWeight": "Gewicht"
 }

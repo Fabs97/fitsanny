@@ -10,7 +10,7 @@ import 'package:sqflite/sqflite.dart';
 part 'database_state.dart';
 
 class DatabaseCubit extends Cubit<DatabaseState> {
-  static const int _version = 3;
+  static const int _version = 4;
   static const String _dbName = 'fitsanny.db';
 
   DatabaseCubit() : super(InitialDatabaseState());
@@ -72,6 +72,11 @@ class DatabaseCubit extends Cubit<DatabaseState> {
         }
         if (oldVersion < 3) {
           await db.execute(createGoalTableQuery);
+        }
+        if (oldVersion < 4) {
+          await db.execute(
+            "ALTER TABLE ${getDatabaseTable(DatabaseTablesEnum.goal)} ADD COLUMN target_type TEXT DEFAULT 'weight'",
+          );
         }
       },
     );

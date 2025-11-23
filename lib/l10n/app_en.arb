@@ -105,5 +105,8 @@
   "trainingTooltip": "Training",
   "logTooltip": "Log",
   "goalsTooltip": "Goals",
-  "pleaseChooseTraining": "Please choose a training first"
+  "pleaseChooseTraining": "Please choose a training first",
+  "goalTypeLabel": "Goal Type",
+  "goalTypeReps": "Reps",
+  "goalTypeWeight": "Weight"
 }

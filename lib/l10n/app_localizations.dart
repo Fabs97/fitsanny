@@ -369,6 +369,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please choose a training first'**
   String get pleaseChooseTraining;
+
+  /// No description provided for @goalTypeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Goal Type'**
+  String get goalTypeLabel;
+
+  /// No description provided for @goalTypeReps.
+  ///
+  /// In en, this message translates to:
+  /// **'Reps'**
+  String get goalTypeReps;
+
+  /// No description provided for @goalTypeWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight'**
+  String get goalTypeWeight;
 }
 
 class _AppLocalizationsDelegate

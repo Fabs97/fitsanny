@@ -14,6 +14,15 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get homeTimeOfDayMorning => 'Morgen';
+
+  @override
+  String get homeTimeOfDayAfternoon => 'Nachmittag';
+
+  @override
+  String get homeTimeOfDayEvening => 'Abend';
+
+  @override
   String get homeSubtitle =>
       '☀️ Sieht nach einem großartigen Moment für ein Training aus ☀️';
 

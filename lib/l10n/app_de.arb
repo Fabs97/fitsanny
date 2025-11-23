@@ -1,6 +1,9 @@
 {
   "@@locale": "de",
   "homeGreeting": "Guten {timeOfDay}, Sanny 🧚🏼‍♀️",
+  "homeTimeOfDayMorning": "Morgen",
+  "homeTimeOfDayAfternoon": "Nachmittag",
+  "homeTimeOfDayEvening": "Abend",
   "homeSubtitle": "☀️ Sieht nach einem großartigen Moment für ein Training aus ☀️",
   "noGoalsSet": "Noch keine Ziele gesetzt. Gehe zu Profil > Ziele, um welche hinzuzufügen!",
   "goalCurrent": "Aktuell: {current}kg",

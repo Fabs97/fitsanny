@@ -103,8 +103,26 @@ abstract class AppLocalizations {
   /// No description provided for @homeGreeting.
   ///
   /// In en, this message translates to:
-  /// **'Guten {timeOfDay}, Sanny 🧚🏼‍♀️'**
+  /// **'Good {timeOfDay}, Sanny 🧚🏼‍♀️'**
   String homeGreeting(String timeOfDay);
+
+  /// No description provided for @homeTimeOfDayMorning.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning'**
+  String get homeTimeOfDayMorning;
+
+  /// No description provided for @homeTimeOfDayAfternoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Afternoon'**
+  String get homeTimeOfDayAfternoon;
+
+  /// No description provided for @homeTimeOfDayEvening.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening'**
+  String get homeTimeOfDayEvening;
 
   /// No description provided for @homeSubtitle.
   ///

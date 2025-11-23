@@ -10,8 +10,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String homeGreeting(String timeOfDay) {
-    return 'Guten $timeOfDay, Sanny 🧚🏼‍♀️';
+    return 'Good $timeOfDay, Sanny 🧚🏼‍♀️';
   }
+
+  @override
+  String get homeTimeOfDayMorning => 'Morning';
+
+  @override
+  String get homeTimeOfDayAfternoon => 'Afternoon';
+
+  @override
+  String get homeTimeOfDayEvening => 'Evening';
 
   @override
   String get homeSubtitle => '☀️ Looks like a great moment for a training ☀️';

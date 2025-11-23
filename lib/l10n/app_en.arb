@@ -1,6 +1,9 @@
 {
   "@@locale": "en",
-  "homeGreeting": "Guten {timeOfDay}, Sanny 🧚🏼‍♀️",
+  "homeGreeting": "Good {timeOfDay}, Sanny 🧚🏼‍♀️",
+  "homeTimeOfDayMorning": "Morning",
+  "homeTimeOfDayAfternoon": "Afternoon",
+  "homeTimeOfDayEvening": "Evening",
   "@homeGreeting": {
     "placeholders": {
       "timeOfDay": {

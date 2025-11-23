@@ -1,6 +1,9 @@
 {
   "@@locale": "it",
   "homeGreeting": "Buon {timeOfDay}, Sanny 🧚🏼‍♀️",
+  "homeTimeOfDayMorning": "Giorno",
+  "homeTimeOfDayAfternoon": "Pomeriggio",
+  "homeTimeOfDayEvening": "Sera",
   "homeSubtitle": "☀️ Sembra un ottimo momento per allenarsi ☀️",
   "noGoalsSet": "Nessun obiettivo impostato. Vai su Profilo > Obiettivi per aggiungerne uno!",
   "goalCurrent": "Attuale: {current}kg",

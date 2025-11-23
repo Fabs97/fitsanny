@@ -25,7 +25,7 @@ class HomePage extends StatelessWidget {
               Text(
                 AppLocalizations.of(
                   context,
-                )!.homeGreeting(_getGreetingForTimeOfDay()),
+                )!.homeGreeting(_getGreetingForTimeOfDay(context)),
                 style: TextStyle(fontSize: 32, fontWeight: FontWeight.w500),
               ),
               Text(
@@ -68,14 +68,14 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  String _getGreetingForTimeOfDay() {
+  String _getGreetingForTimeOfDay(BuildContext context) {
     final now = DateTime.now().hour;
     if (now >= 6 && now < 12) {
-      return 'morgen';
+      return AppLocalizations.of(context)!.homeTimeOfDayMorning;
     } else if (now >= 12 && now < 18) {
-      return 'tag';
+      return AppLocalizations.of(context)!.homeTimeOfDayAfternoon;
     } else if (now >= 18 || now < 6) {
-      return 'abend';
+      return AppLocalizations.of(context)!.homeTimeOfDayEvening;
     }
     return 'tag';
   }

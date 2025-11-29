@@ -22,29 +22,41 @@ class DatabaseCubit extends Cubit<DatabaseState> {
 
   Future<void> initializeDatabase() async {
     final databasePath = join(await getDatabasesPath(), _dbName);
+
     var exists = await databaseExists(databasePath);
 
     if (!exists) {
+      print(
+        '🟠 [DatabaseCubit] Database does not exist, checking for backup...',
+      );
       // Make sure the directory exists
       try {
         await Directory(dirname(databasePath)).create(recursive: true);
-      } catch (_) {}
+      } catch (e) {
+      }
 
       // Check if backup exists and try to restore
       final fileService = FileService();
-      final hasBackup = await fileService.hasBackup();
+
+      print(
+        '🟠 [DatabaseCubit] Checking for backup (skipping permission check)...',
+      );
+      // Skip permission check since PermissionAwareApp already verified permissions
+      final hasBackup = await fileService.hasBackup(skipPermissionCheck: true);
 
       if (hasBackup) {
-        print('📦 Backup found, attempting to restore...');
-        final restored = await fileService.restoreDatabase(databasePath);
+        // Skip permission check since PermissionAwareApp already verified permissions
+        final restored = await fileService.restoreDatabase(
+          databasePath,
+          skipPermissionCheck: true,
+        );
 
         if (!restored) {
           // Restore failed, will create new database via onCreate
-          print('⚠️ Restore failed, will create new database');
+        } else {
         }
       } else {
         // No backup exists, will create new database via onCreate
-        print('📝 No backup found, will create new database');
       }
     }
 
@@ -53,7 +65,6 @@ class DatabaseCubit extends Cubit<DatabaseState> {
       databasePath,
       version: _version,
       onCreate: (db, version) async {
-        print('🆕 Creating new database with version $version');
         // Create all tables
         await db.execute(createExerciseNameTableQuery);
         await db.execute(createExerciseTableQuery);
@@ -64,19 +75,75 @@ class DatabaseCubit extends Cubit<DatabaseState> {
         await db.execute(createGoalTableQuery);
       },
       onUpgrade: (db, oldVersion, newVersion) async {
-        print('🔄 Upgrading database from version $oldVersion to $newVersion');
-        if (oldVersion < 2) {
-          await db.execute(
-            'ALTER TABLE ${getDatabaseTable(DatabaseTablesEnum.training)} ADD COLUMN description TEXT',
-          );
-        }
-        if (oldVersion < 3) {
-          await db.execute(createGoalTableQuery);
-        }
-        if (oldVersion < 4) {
-          await db.execute(
-            "ALTER TABLE ${getDatabaseTable(DatabaseTablesEnum.goal)} ADD COLUMN target_type TEXT DEFAULT 'weight'",
-          );
+        print(
+          '🔄 [DatabaseCubit] Upgrading database from version $oldVersion to $newVersion',
+        );
+
+        try {
+          // Version 2: Add description column to training table
+          if (oldVersion < 2) {
+            print(
+              '🟠 [DatabaseCubit] Upgrading to version 2: adding description column',
+            );
+            // Check if column exists before adding
+            final trainingColumns = await db.rawQuery(
+              'PRAGMA table_info(training)',
+            );
+            final hasDescription = trainingColumns.any(
+              (col) => col['name'] == 'description',
+            );
+
+            if (!hasDescription) {
+              await db.execute(
+                'ALTER TABLE ${getDatabaseTable(DatabaseTablesEnum.training)} ADD COLUMN description TEXT',
+              );
+            } else {
+              print(
+                '🟠 [DatabaseCubit] Description column already exists, skipping',
+              );
+            }
+          }
+
+          // Version 3: Create goal table
+          if (oldVersion < 3) {
+            print(
+              '🟠 [DatabaseCubit] Upgrading to version 3: creating goal table',
+            );
+            // Check if table exists before creating
+            final tables = await db.rawQuery(
+              "SELECT name FROM sqlite_master WHERE type='table' AND name='goal'",
+            );
+
+            if (tables.isEmpty) {
+              await db.execute(createGoalTableQuery);
+            } else {
+            }
+          }
+
+          // Version 4: Add target_type column to goal table
+          if (oldVersion < 4) {
+            print(
+              '🟠 [DatabaseCubit] Upgrading to version 4: adding target_type column',
+            );
+            // Check if column exists before adding
+            final goalColumns = await db.rawQuery('PRAGMA table_info(goal)');
+            final hasTargetType = goalColumns.any(
+              (col) => col['name'] == 'target_type',
+            );
+
+            if (!hasTargetType) {
+              await db.execute(
+                "ALTER TABLE ${getDatabaseTable(DatabaseTablesEnum.goal)} ADD COLUMN target_type TEXT DEFAULT 'weight'",
+              );
+            } else {
+              print(
+                '🟠 [DatabaseCubit] target_type column already exists, skipping',
+              );
+            }
+          }
+
+        } catch (e) {
+          rethrow;
         }
       },
     );
@@ -85,8 +152,12 @@ class DatabaseCubit extends Cubit<DatabaseState> {
     await _ensureSchemaUpToDate();
 
     await database?.execute('PRAGMA foreign_keys = ON');
+
     await _insertDefaultExercises();
 
+    print(
+      '✅ [DatabaseCubit] Database initialization complete, emitting LoadedDatabaseState',
+    );
     emit(LoadedDatabaseState(database!));
   }
 
@@ -158,7 +229,6 @@ class DatabaseCubit extends Cubit<DatabaseState> {
       );
     }
 
-    print('✅ Default exercises inserted (${baseExercises.length})');
   }
 }
 

@@ -12,11 +12,18 @@ class FileService {
         // Check if we are on Android 11+ (API 30+)
         // On Android 11+, we need MANAGE_EXTERNAL_STORAGE to access shared Documents folder
         // especially for files created by previous installations
-        if (await Permission.manageExternalStorage.status.isGranted) {
+        final manageExternalStorageStatus =
+            await Permission.manageExternalStorage.status;
+
+        if (manageExternalStorageStatus.isGranted) {
           return true;
         }
 
-        if (await Permission.manageExternalStorage.request().isGranted) {
+        final manageExternalStorageRequest = await Permission
+            .manageExternalStorage
+            .request();
+
+        if (manageExternalStorageRequest.isGranted) {
           return true;
         }
 
@@ -26,17 +33,20 @@ class FileService {
         if (status.isGranted) {
           return true;
         } else if (status.isPermanentlyDenied) {
-          print('⚠️ Storage permission permanently denied');
-          await openAppSettings();
+          // Don't automatically open settings - let the UI handle this
           return false;
         }
         return false;
       }
       return true; // iOS doesn't need this permission
     } catch (e) {
-      print('Error requesting storage permission: $e');
       return false;
     }
+  }
+
+  /// Open app settings for the user to manually grant permissions
+  Future<void> openStorageSettings() async {
+    await openAppSettings();
   }
 
   Future<void> saveFile(String fileName, List<int> bytes) async {
@@ -52,25 +62,31 @@ class FileService {
 
   /// Get the backup directory in external storage Documents folder
   /// This persists even after app uninstallation
-  Future<String?> getBackupDirectory() async {
+  ///
+  /// Set [skipPermissionCheck] to true if permissions have already been verified
+  /// to avoid redundant permission requests that can cause hangs
+  Future<String?> getBackupDirectory({bool skipPermissionCheck = false}) async {
     try {
-      // Request permission first
-      final hasPermission = await requestStoragePermission();
-      if (!hasPermission) {
-        print('❌ Storage permission not granted');
-        return null;
+      // Request permission first (unless skipped)
+      if (!skipPermissionCheck) {
+        final hasPermission = await requestStoragePermission();
+        if (!hasPermission) {
+          return null;
+        }
       }
 
       final documentsDir = await ExternalPath.getExternalStoragePublicDirectory(
         ExternalPath.DIRECTORY_DOCUMENTS,
       );
+
       final backupDir = Directory('$documentsDir/Fitsanny');
+
       if (!await backupDir.exists()) {
         await backupDir.create(recursive: true);
       }
+
       return backupDir.path;
     } catch (e) {
-      print('Error getting backup directory: $e');
       return null;
     }
   }
@@ -87,37 +103,44 @@ class FileService {
   }
 
   /// Check if a backup file exists
-  Future<bool> hasBackup() async {
+  /// Set [skipPermissionCheck] to true if permissions have already been verified
+  Future<bool> hasBackup({bool skipPermissionCheck = false}) async {
     try {
-      final backupDir = await getBackupDirectory();
+      final backupDir = await getBackupDirectory(
+        skipPermissionCheck: skipPermissionCheck,
+      );
       if (backupDir != null) {
         final backupFile = File('$backupDir/fitsanny_backup.db');
-        return await backupFile.exists();
+        final exists = await backupFile.exists();
+        return exists;
       }
       return false;
     } catch (e) {
-      print('Error checking for backup: $e');
       return false;
     }
   }
 
   /// Restore database from backup file
   /// Returns true if restore was successful, false otherwise
-  Future<bool> restoreDatabase(String databasePath) async {
+  /// Set [skipPermissionCheck] to true if permissions have already been verified
+  Future<bool> restoreDatabase(
+    String databasePath, {
+    bool skipPermissionCheck = false,
+  }) async {
     try {
-      final backupDir = await getBackupDirectory();
+      final backupDir = await getBackupDirectory(
+        skipPermissionCheck: skipPermissionCheck,
+      );
       if (backupDir != null) {
         final backupFile = File('$backupDir/fitsanny_backup.db');
         if (await backupFile.exists()) {
           final dbFile = File(databasePath);
           await backupFile.copy(dbFile.path);
-          print('✅ Database restored from backup');
           return true;
         }
       }
       return false;
     } catch (e) {
-      print('❌ Error restoring database from backup: $e');
       return false;
     }
   }
